@@ -30,7 +30,7 @@ def generate_analysis_report(
     grid_metadata: Dict[str, Any],
     artifact_paths: Dict[str, Path],
     reports_dir: Path,
-    firebase_project_id: str,
+    database_project: str,
 ) -> Tuple[Path, Path]:
     """Generate both JSON and Markdown comprehensive analysis reports.
 
@@ -40,7 +40,7 @@ def generate_analysis_report(
         grid_metadata: Metadata regarding active weights and score redistribution.
         artifact_paths: File paths to generated static PNG charts and HTML map.
         reports_dir: Directory where report files will be written.
-        firebase_project_id: Firebase project identifier.
+        database_project: Supabase project reference.
 
     Returns:
         Tuple[json_report_path, md_report_path]
@@ -75,9 +75,9 @@ def generate_analysis_report(
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "scope": "Part 2: Fire Activity Exploratory Data Analysis & Explainable Priority-Zone Classification",
         "data_source": {
-            "platform": "Google Firebase Cloud Firestore",
+            "platform": "Supabase (Postgres)",
             "collection": "fire_detections",
-            "project_id": firebase_project_id,
+            "project_id": database_project,
         },
         "eda_results": eda_results,
         "grid_metadata": grid_metadata,
@@ -104,7 +104,7 @@ def generate_analysis_report(
         "",
         f"**Report Generated:** {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}  ",
         "**Pipeline Phase:** Part 2 - Exploratory Data Analysis, Hotspots & Explainable Priority Scoring  ",
-        f"**Data Source:** Firebase Cloud Firestore (`fire_detections` collection in project `{firebase_project_id}`)  ",
+        f"**Data Source:** Supabase (Postgres) (`fire_detections` table in project `{database_project}`)  ",
         "",
         "---",
         "",
@@ -116,7 +116,7 @@ def generate_analysis_report(
         "",
         "| Overview Metric | Value |",
         "| :--- | :--- |",
-        f"| **Total Firestore Records Analyzed** | **{ov.get('total_records', 0)}** |",
+        f"| **Total Supabase Records Analyzed** | **{ov.get('total_records', 0)}** |",
         f"| **Observation Temporal Window (UTC)** | `{ov.get('earliest_detection_datetime', 'N/A')}` to `{ov.get('latest_detection_datetime', 'N/A')}` |",
         f"| **Unique Observation Dates** | {ov.get('unique_detection_dates_count', 0)} ({', '.join(ov.get('unique_detection_dates', []))}) |",
         f"| **Satellites Represented** | {', '.join(ov.get('satellites', []))} ({ov.get('unique_satellites_count', 0)} total) |",
@@ -169,6 +169,23 @@ def generate_analysis_report(
         md_lines.append(
             f"| {i} | `{top['acq_datetime']}` | {top['latitude']}, {top['longitude']} | **{top['frp']} MW** | {top['confidence']} | {top['satellite']} |"
         )
+
+    distributions = eda_results.get("distributions", {})
+    profiled = [(col, d) for col, d in distributions.items() if isinstance(d, dict) and d.get("available")]
+    if profiled:
+        md_lines.extend([
+            "",
+            "### Distribution Shape & IQR Outliers (FRP and Brightness)",
+            "Outliers are values outside Tukey's fences: Q1 − 1.5·IQR and Q3 + 1.5·IQR.",
+            "",
+            "| Metric | Median | Mean | IQR | Upper Fence | Skewness | Outliers |",
+            "| :--- | :--- | :--- | :--- | :--- | :--- | :--- |",
+        ])
+        for _, d in profiled:
+            md_lines.append(
+                f"| {d['label']} | {d['median']} | {d['mean']} | {d['iqr']} | {d['upper_fence']} | "
+                f"{d['skewness']} | **{d['outlier_count']}** ({d['outlier_percentage']}%) |"
+            )
 
     md_lines.extend([
         "",
@@ -272,7 +289,7 @@ def generate_analysis_report(
         "",
         "> A thermal anomaly indicates a pixel with significant temperature contrast compared to its ambient background. "
         "> Detections can stem from agricultural burns, industrial flaring, hot ground features, or atmospheric reflection. "
-        "> Prioritization scores represent relative statistical activity inside the current Firestore dataset window and "
+        "> Prioritization scores represent relative statistical activity inside the current Supabase dataset window and "
         "> must not be cited as predictive wildfire occurrence forecasts.",
         "",
     ])

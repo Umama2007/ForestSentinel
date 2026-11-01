@@ -23,7 +23,7 @@ if str(SRC_PATH) not in sys.path:
 
 from forestsentinel.config import load_config
 from forestsentinel.conservation_pipeline import ConservationPipeline
-from forestsentinel.firebase_client import FirebaseConfigError
+from forestsentinel.supabase_client import SupabaseConfigError
 from forestsentinel.analytics_repository import NoDataError
 from forestsentinel.pipeline import setup_logging
 
@@ -93,8 +93,8 @@ def main() -> int:
         print(f"Map: {rel_map}\n")
         return 0
 
-    except FirebaseConfigError as fb_err:
-        print(f"\n[FIREBASE ERROR] Credentials issue: {fb_err}\n")
+    except SupabaseConfigError as db_err:
+        print(f"\n[SUPABASE ERROR] Credentials issue: {db_err}\n")
         return 1
     except NoDataError as nd_err:
         print(f"\n[DATA ERROR] No fire detections found: {nd_err}\n")

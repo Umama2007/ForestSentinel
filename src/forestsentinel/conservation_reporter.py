@@ -30,7 +30,7 @@ def generate_conservation_report(
     analysis_results: Dict[str, Any],
     artifact_paths: Dict[str, Path],
     output_dir: Path,
-    firebase_project_id: str,
+    database_project: str,
     run_id: str,
     iucn_configured: bool = False,
 ) -> Tuple[Path, Path]:
@@ -40,7 +40,7 @@ def generate_conservation_report(
         analysis_results: Dictionary returned by ConservationAnalyzer.run_analysis.
         artifact_paths: Dictionary mapping artifact names to local Path objects.
         output_dir: Timestamped report destination directory.
-        firebase_project_id: Configured Firebase project ID.
+        database_project: Configured Supabase project reference.
         run_id: Unique analysis run ID.
         iucn_configured: Whether IUCN API token was configured for this run.
 
@@ -63,11 +63,11 @@ def generate_conservation_report(
             "scope": "Part 3: Conservation Exposure Analysis",
             "run_id": run_id,
             "generated_at": generated_at,
-            "firebase_project_id": firebase_project_id,
+            "database_project": database_project,
             "iucn_api_configured": iucn_configured,
         },
         "data_sources": [
-            "NASA FIRMS thermal-anomaly active-fire detections (via Cloud Firestore)",
+            "NASA FIRMS thermal-anomaly active-fire detections (via Supabase)",
             "GBIF Occurrence Search API (https://api.gbif.org/v1/occurrence/search)",
             "IUCN Red List API v4 (https://api.iucnredlist.org), where status was verified",
         ],
@@ -128,7 +128,7 @@ def _build_markdown_report(
         f"**Generated:** {meta['generated_at']}  ",
         f"**Run ID:** `{meta['run_id']}`  ",
         f"**Scope:** Part 3 Conservation Exposure Analysis  ",
-        f"**Firebase Project ID:** `{meta['firebase_project_id']}`  ",
+        f"**Supabase Project:** `{meta['database_project']}`  ",
         f"**IUCN API Enrichment:** {'Configured (Live API v4)' if iucn_configured else 'Not Configured (Pending IUCN Verification)'}  ",
         f"",
         f"---",
@@ -138,7 +138,7 @@ def _build_markdown_report(
         f"This phase integrates NASA FIRMS active fire hotspots with biodiversity occurrence records from the Global Biodiversity Information Facility (GBIF) and conservation statuses from the IUCN Red List API v4.",
         f"",
         f"### Data Sources",
-        f"- **NASA FIRMS**: Active fire detections stored in Cloud Firestore collection `fire_detections`.",
+        f"- **NASA FIRMS**: Active fire detections stored in Supabase collection `fire_detections`.",
         f"- **GBIF Occurrence Search API**: Biodiversity occurrence records retrieved for selected High and Medium fire-activity priority grid cells.",
         f"- **IUCN Red List API v4**: Conservation assessment categories (CR, EN, VU, NT, LC, DD), verified through official API authentication.",
         f"",
@@ -223,9 +223,9 @@ def _build_markdown_report(
         f"",
         f"## 4. Privacy Safeguards & Data Governance",
         f"",
-        f"- **No Exact Coordinates Saved**: Exact latitudes and longitudes from GBIF occurrence records were strictly excluded from Firestore storage, reporting tables, logs, and map popups.",
+        f"- **No Exact Coordinates Saved**: Exact latitudes and longitudes from GBIF occurrence records were strictly excluded from Supabase storage, reporting tables, logs, and map popups.",
         f"- **Aggregation Boundary**: All biodiversity occurrences are aggregated to 0.25° geographic grid cells (~27.7 km at equator).",
-        f"- **Firestore Security**: Firestore documents in `species_grid_summaries` only store non-sensitive taxonomic summaries and year spans.",
+        f"- **Database Security**: Database rows in `species_grid_summaries` only store non-sensitive taxonomic summaries and year spans.",
         f"- **No Proof of Harm**: This platform calculates potential conservation exposure indicators and makes no claims regarding actual individual wildlife injury or mortality.",
         f"",
         f"---",

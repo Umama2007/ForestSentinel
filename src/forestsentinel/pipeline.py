@@ -1,8 +1,8 @@
 """Pipeline orchestration module for ForestSentinel.
 
 Coordinates the end-to-end ETL flow:
-Config -> Firebase Run Init -> NASA FIRMS Extraction -> Pandas Transformation
--> Pydantic v2 Schema Validation -> Firestore Persistence -> Reporting.
+Config -> Supabase Run Init -> NASA FIRMS Extraction -> Pandas Transformation
+-> Pydantic v2 Schema Validation -> Supabase Persistence -> Reporting.
 """
 
 from __future__ import annotations
@@ -15,7 +15,8 @@ from typing import Any, Dict, Optional, Tuple
 
 from forestsentinel.config import Config, load_config
 from forestsentinel.extractor import ExtractionError, FirmsExtractor
-from forestsentinel.firebase_client import FirebaseClient, FirebaseConfigError
+from forestsentinel.supabase_client import SupabaseClient, SupabaseConfigError
+from forestsentinel.pdf_report import build_etl_pdf, try_build
 from forestsentinel.reporter import generate_etl_report
 from forestsentinel.schemas import validate_fire_records
 from forestsentinel.transformer import FirmsTransformer
@@ -64,13 +65,13 @@ class ForestSentinelETL:
     def __init__(
         self,
         config: Config,
-        firebase_client: Optional[FirebaseClient] = None,
+        db_client: Optional[SupabaseClient] = None,
     ) -> None:
-        """Initialize the pipeline with configuration and optional Firebase client."""
+        """Initialize the pipeline with configuration and optional Supabase client."""
         self.config = config
-        self.fb_client = firebase_client or FirebaseClient(
-            service_account_path=config.firebase_service_account_path,
-            project_id=config.firebase_project_id,
+        self.db = db_client or SupabaseClient(
+            url=config.supabase_url,
+            service_role_key=config.supabase_service_role_key,
         )
         self.extractor = FirmsExtractor(config=config)
         self.transformer = FirmsTransformer()
@@ -91,8 +92,8 @@ class ForestSentinelETL:
             "day_range": self.config.day_range,
         }
 
-        # Step 1: Create ETL Run in Firestore
-        run_id = self.fb_client.create_etl_run(run_metadata)
+        # Step 1: Create ETL Run in Supabase
+        run_id = self.db.create_etl_run(run_metadata)
         logger.info("Pipeline run initiated with Run ID: %s", run_id)
 
         try:
@@ -114,13 +115,13 @@ class ForestSentinelETL:
             # Combine all rejected records for storage and auditing
             all_rejections = cleaning_rejections + pydantic_rejections
 
-            # Step 5: Save to Firebase Cloud Firestore
-            logger.info("Step 4/5: Persisting valid detections and audit logs into Firestore...")
-            inserted_count, skipped_count = self.fb_client.save_fire_detections(
+            # Step 5: Save to Supabase (Postgres)
+            logger.info("Step 4/5: Persisting valid detections and audit logs into Supabase...")
+            inserted_count, skipped_count = self.db.save_fire_detections(
                 run_id=run_id,
                 valid_records=valid_records,
             )
-            saved_rejections_count = self.fb_client.save_rejected_records(
+            saved_rejections_count = self.db.save_rejected_records(
                 run_id=run_id,
                 rejected_records=all_rejections,
             )
@@ -139,8 +140,8 @@ class ForestSentinelETL:
                 "saved_rejections": saved_rejections_count,
             }
 
-            # Finalize ETL Run in Firestore
-            self.fb_client.update_etl_run(
+            # Finalize ETL Run in Supabase
+            self.db.update_etl_run(
                 run_id=run_id,
                 updates={
                     "finished_at": finished_at.isoformat(),
@@ -161,7 +162,7 @@ class ForestSentinelETL:
                 "api_source": self.config.firms_source,
                 "study_bbox": self.config.amazon_bbox,
                 "day_range": self.config.day_range,
-                "firebase_project_id": self.config.firebase_project_id,
+                "database_project": self.config.database_project,
                 "raw_csv_saved_at": str(raw_csv_path),
                 "counts": counts,
                 "rejected_sample": all_rejections[:5],
@@ -174,6 +175,8 @@ class ForestSentinelETL:
 
             summary_payload["json_report_path"] = str(json_report)
             summary_payload["md_report_path"] = str(md_report)
+            pdf_report = try_build(build_etl_pdf, summary_payload, json_report.with_suffix(".pdf"))
+            summary_payload["pdf_report_path"] = str(pdf_report) if pdf_report else None
 
             logger.info("ForestSentinel ETL finished successfully in %.2fs!", duration_seconds)
             return summary_payload
@@ -183,9 +186,9 @@ class ForestSentinelETL:
             safe_error_msg = f"{type(exc).__name__}: {str(exc)}"
             logger.exception("Pipeline run %s failed: %s", run_id, safe_error_msg)
 
-            # Attempt to update run doc in Firestore to failed
+            # Attempt to update run doc in Supabase to failed
             try:
-                self.fb_client.update_etl_run(
+                self.db.update_etl_run(
                     run_id=run_id,
                     updates={
                         "finished_at": finished_at.isoformat(),
@@ -193,7 +196,7 @@ class ForestSentinelETL:
                         "error_message": safe_error_msg,
                     },
                 )
-            except Exception as fb_err:
-                logger.error("Failed to mark run as failed in Firestore: %s", fb_err)
+            except Exception as db_err:
+                logger.error("Failed to mark run as failed in Supabase: %s", db_err)
 
             raise

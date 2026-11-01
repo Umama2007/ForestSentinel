@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class IUCNClient:
-    """Client for querying the IUCN Red List API v4 with local and Firestore caching."""
+    """Client for querying the IUCN Red List API v4 with local and Supabase caching."""
 
     DEFAULT_BASE_URL = "https://api.iucnredlist.org"
     USER_AGENT = "ForestSentinel/1.0 (Conservation Exposure Analysis; Academic Research)"
@@ -43,7 +43,7 @@ class IUCNClient:
         self,
         api_token: Optional[str] = None,
         base_url: str = DEFAULT_BASE_URL,
-        firestore_repository: Optional[Any] = None,
+        repository: Optional[Any] = None,
         timeout_seconds: int = 20,
         max_retries: int = 2,
     ) -> None:
@@ -52,13 +52,13 @@ class IUCNClient:
         Args:
             api_token: Optional personal API token for IUCN Red List v4.
             base_url: Base endpoint URL for the IUCN API.
-            firestore_repository: Optional ConservationRepository instance for Firestore caching.
+            repository: Optional ConservationRepository instance for database caching.
             timeout_seconds: Timeout for HTTP requests in seconds.
             max_retries: Maximum retry attempts for transient errors.
         """
         self.api_token = api_token.strip() if api_token and api_token.strip() else None
         self.base_url = (base_url or self.DEFAULT_BASE_URL).rstrip("/")
-        self.repository = firestore_repository
+        self.repository = repository
         self.timeout = max(5, int(timeout_seconds))
         self.max_retries = max(1, int(max_retries))
 
@@ -77,7 +77,7 @@ class IUCNClient:
     ) -> Dict[str, Any]:
         """Retrieve verified IUCN conservation category for a scientific name.
 
-        Checks memory cache first, then Firestore cache, and queries the IUCN API
+        Checks memory cache first, then Supabase cache, and queries the IUCN API
         only if credentials are available and no cache entry exists.
 
         Args:
@@ -90,7 +90,7 @@ class IUCNClient:
             - iucn_category (CR, EN, VU, NT, LC, DD, etc. or None)
             - iucn_assessment_date (str or None)
             - iucn_verified (bool)
-            - iucn_source (str: 'iucn_api_v4', 'firestore_cache', or 'unavailable')
+            - iucn_source (str: 'iucn_api_v4', 'database_cache', or 'unavailable')
         """
         if not scientific_name or not scientific_name.strip():
             return {
@@ -109,7 +109,7 @@ class IUCNClient:
         if cache_key in self._memory_cache:
             return self._memory_cache[cache_key]
 
-        # 2. Firestore cache check (if repository available)
+        # 2. Supabase cache check (if repository available)
         if self.repository is not None:
             cached_doc = self.repository.get_cached_assessment(scientific_name=norm_name, taxon_key=taxon_key)
             if cached_doc:
@@ -133,12 +133,12 @@ class IUCNClient:
         api_result = self._fetch_from_api(norm_name)
         if api_result["iucn_verified"]:
             api_result["taxon_key"] = taxon_key
-            # Cache in Firestore if repository configured
+            # Cache in Supabase if repository configured
             if self.repository is not None:
                 try:
                     self.repository.save_cached_assessment(api_result)
                 except Exception as exc:
-                    logger.warning("Failed to cache IUCN assessment in Firestore: %s", exc)
+                    logger.warning("Failed to cache IUCN assessment in Supabase: %s", exc)
 
         self._memory_cache[cache_key] = api_result
         return api_result

@@ -38,9 +38,7 @@ venv.bak/
 .env
 .env.local
 .env.*.local
-secrets/firebase-service-account.json
 secrets/*.json
-!secrets/firebase-service-account.example.json
 
 # Local database files
 *.db
@@ -52,6 +50,8 @@ data/raw/*.csv
 data/processed/
 reports/*.json
 reports/*.md
+reports/*.pdf
+reports/pdf/
 reports/charts/
 reports/conservation/
 logs/*.log

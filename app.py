@@ -22,6 +22,7 @@ logger = logging.getLogger("forestsentinel.web")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 BASE_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(BASE_DIR / "src"))
 
 app = Flask(
     __name__,
@@ -80,37 +81,149 @@ def serve_docs_assets(filename: str):
     return "Asset not found", 404
 
 
-@app.route("/api/metrics")
-def api_metrics():
-    """Return consolidated live metrics from verified analysis and conservation runs."""
-    metrics: Dict[str, Any] = {
-        "status": "ok",
-        "firestore_project_id": "forestsentinel-58520",
-        "fire_detections": 357,
-        "populated_grid_cells": 44,
-        "high_priority_hotspots": 4,
-        "medium_priority_hotspots": 12,
-        "low_priority_hotspots": 28,
-        "species_summaries": 23,
-        "gbif_occurrences": 31,
-        "species_status": "Pending IUCN Verification",
-        "tests_passed": 68,
-        "total_tests": 68,
+def latest_run_dir(pattern: str) -> Optional[Path]:
+    """Return the most recent timestamped run directory matching a glob pattern."""
+    dirs = [Path(p) for p in glob.glob(str(BASE_DIR / pattern)) if Path(p).is_dir()]
+    return max(dirs, key=lambda d: d.name) if dirs else None
+
+
+def load_json(path: Optional[Path]) -> Optional[Dict[str, Any]]:
+    """Read a JSON report, returning None if it is missing or unreadable."""
+    if not path or not path.exists():
+        return None
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as exc:
+        logger.warning(f"Could not read report {path.name}: {exc}")
+        return None
+
+
+@app.route("/figures/<group>/<path:filename>")
+def serve_figure(group: str, filename: str):
+    """Serve a matplotlib/seaborn figure from the latest analysis or conservation run."""
+    patterns = {"analysis": "reports/charts/*", "conservation": "reports/conservation/*"}
+    if group not in patterns or not filename.endswith(".png"):
+        return "Figure not found", 404
+    run_dir = latest_run_dir(patterns[group])
+    if not run_dir or not (run_dir / filename).exists():
+        return "Figure not found", 404
+    return send_from_directory(run_dir, filename)
+
+
+def latest_reports() -> Dict[str, Any]:
+    """Locate the newest ETL, analysis and conservation reports and their chart folders."""
+    etl_path = get_latest_file("reports/etl_report_*.json")
+    analysis_path = get_latest_file("reports/analysis_report_*.json")
+    conservation_dir = latest_run_dir("reports/conservation/*")
+    analysis = load_json(analysis_path)
+    conservation = load_json(conservation_dir / "conservation_report.json" if conservation_dir else None)
+
+    # GBIF results were computed against a set of hotspot cells; flag when the
+    # current analysis ranks a different set of Medium/High cells.
+    conservation_stale = False
+    if analysis and conservation:
+        current = {
+            c["grid_id"] for c in analysis.get("top_hotspot_cells", [])
+            if c.get("priority_label") in ("High Priority", "Medium Priority")
+        }
+        queried = {c["grid_id"] for c in conservation.get("cell_conservation_summaries", [])}
+        conservation_stale = current != queried
+
+    return {
+        "etl_path": etl_path,
+        "analysis_path": analysis_path,
+        "etl": load_json(etl_path),
+        "analysis": analysis,
+        "conservation": conservation,
+        "conservation_dir": conservation_dir,
+        "charts_dir": latest_run_dir("reports/charts/*"),
+        "conservation_stale": conservation_stale,
     }
 
-    # Attempt to load exact counts from the latest JSON reports
-    latest_analysis = get_latest_file("reports/analysis_report_*.json")
-    if latest_analysis and latest_analysis.exists():
-        try:
-            with open(latest_analysis, "r", encoding="utf-8") as f:
-                data = json.load(f)
-                summary = data.get("summary", {})
-                metrics["fire_detections"] = summary.get("total_detections_analyzed", 357)
-                metrics["populated_grid_cells"] = summary.get("populated_grid_cells", 44)
-        except Exception as exc:
-            logger.warning(f"Could not read analysis report: {exc}")
 
-    return jsonify(metrics)
+@app.route("/api/dashboard")
+def api_dashboard():
+    """Return the latest ETL, EDA and GBIF results, read directly from generated reports."""
+    r = latest_reports()
+    charts_dir, conservation_dir = r["charts_dir"], r["conservation_dir"]
+    figures = {
+        "analysis": sorted(p.name for p in charts_dir.glob("*.png")) if charts_dir else [],
+        "conservation": sorted(p.name for p in conservation_dir.glob("*.png")) if conservation_dir else [],
+    }
+    return jsonify({
+        "etl": r["etl"],
+        "analysis": r["analysis"],
+        "conservation": r["conservation"],
+        "conservation_stale": r["conservation_stale"],
+        "figures": figures,
+        "sources": {
+            "etl": r["etl_path"].name if r["etl_path"] else None,
+            "analysis": r["analysis_path"].name if r["analysis_path"] else None,
+            "conservation": conservation_dir.name if conservation_dir else None,
+        },
+    })
+
+
+PDF_KINDS = {
+    "project": "Project Report",
+    "etl": "ETL Report",
+    "analysis": "Analysis Report",
+    "biodiversity": "Biodiversity Report",
+}
+
+
+@app.route("/reports/<kind>.pdf")
+def report_pdf(kind: str):
+    """Build a PDF report from the latest JSON reports and serve it (inline, or ?download=1)."""
+    from forestsentinel import pdf_report
+
+    if kind not in PDF_KINDS:
+        return "Unknown report", 404
+    r = latest_reports()
+    etl, analysis, cons = r["etl"], r["analysis"], r["conservation"]
+    needed = {"etl": etl, "analysis": analysis, "biodiversity": cons, "project": analysis}[kind]
+    if not needed:
+        return f"No data for the {PDF_KINDS[kind].lower()} yet. Run the pipeline first.", 404
+
+    out = BASE_DIR / "reports" / "pdf" / f"ForestSentinel_{PDF_KINDS[kind].replace(' ', '_')}.pdf"
+    try:
+        if kind == "etl":
+            pdf_report.build_etl_pdf(etl, out)
+        elif kind == "analysis":
+            pdf_report.build_analysis_pdf(analysis, r["charts_dir"], out, etl=etl)
+        elif kind == "biodiversity":
+            pdf_report.build_conservation_pdf(cons, r["conservation_dir"], out)
+        else:
+            pdf_report.build_project_pdf(etl, analysis, r["charts_dir"], cons, r["conservation_dir"], out,
+                                         cons_stale=r["conservation_stale"])
+    except Exception as exc:
+        logger.exception("PDF generation failed")
+        return f"Could not build the PDF: {exc}", 500
+
+    stamp = (analysis or etl or {}).get("generated_at") or (etl or {}).get("started_at") or ""
+    download_name = f"ForestSentinel_{PDF_KINDS[kind].replace(' ', '_')}_{stamp[:10] or 'latest'}.pdf"
+    return send_file(out, mimetype="application/pdf", as_attachment=request.args.get("download") == "1",
+                     download_name=download_name, max_age=0)
+
+
+@app.route("/api/metrics")
+def api_metrics():
+    """Return headline metrics from the latest reports (kept for API compatibility)."""
+    analysis = load_json(get_latest_file("reports/analysis_report_*.json")) or {}
+    etl = load_json(get_latest_file("reports/etl_report_*.json")) or {}
+    grid = analysis.get("grid_metadata", {})
+    overview = analysis.get("eda_results", {}).get("overview", {})
+    return jsonify({
+        "status": "ok" if analysis else "no_analysis",
+        "database_project": etl.get("database_project") or etl.get("firebase_project_id"),
+        "raw_rows_extracted": etl.get("counts", {}).get("raw_rows_extracted"),
+        "fire_detections": overview.get("total_records"),
+        "populated_grid_cells": grid.get("total_populated_cells"),
+        "high_priority_hotspots": grid.get("high_priority_count"),
+        "medium_priority_hotspots": grid.get("medium_priority_count"),
+        "low_priority_hotspots": grid.get("low_priority_count"),
+    })
 
 
 @app.route("/api/run/<stage>", methods=["POST"])

@@ -2,8 +2,8 @@
 
 Coordinates the end-to-end Part 2 analysis flow:
 1. Load configuration
-2. Securely initialize Firebase Client
-3. Load fire detections from Firestore via AnalyticsRepository
+2. Securely initialize Supabase client
+3. Load fire detections from Supabase via AnalyticsRepository
 4. Execute EDA with FireActivityAnalyzer
 5. Perform grid-cell spatial tessellation & explainable priority scoring
 6. Render static charts & interactive Folium map artifact with Visualizer
@@ -21,7 +21,8 @@ from forestsentinel.analysis_reporter import generate_analysis_report
 from forestsentinel.analytics_repository import AnalyticsRepository, NoDataError
 from forestsentinel.analyzer import FireActivityAnalyzer
 from forestsentinel.config import Config, load_config
-from forestsentinel.firebase_client import FirebaseClient, FirebaseConfigError
+from forestsentinel.supabase_client import SupabaseClient, SupabaseConfigError
+from forestsentinel.pdf_report import build_analysis_pdf, latest_etl_report, load_json, try_build
 from forestsentinel.priority_scoring import PriorityScorer
 from forestsentinel.visualizer import Visualizer
 
@@ -34,15 +35,15 @@ class ForestSentinelAnalysis:
     def __init__(
         self,
         config: Config,
-        firebase_client: Optional[FirebaseClient] = None,
+        db_client: Optional[SupabaseClient] = None,
     ) -> None:
-        """Initialize analysis pipeline with configuration and optional injected FirebaseClient."""
+        """Initialize analysis pipeline with configuration and optional injected SupabaseClient."""
         self.config = config
-        self.fb_client = firebase_client or FirebaseClient(
-            service_account_path=config.firebase_service_account_path,
-            project_id=config.firebase_project_id,
+        self.db = db_client or SupabaseClient(
+            url=config.supabase_url,
+            service_role_key=config.supabase_service_role_key,
         )
-        self.repository = AnalyticsRepository(firebase_client=self.fb_client)
+        self.repository = AnalyticsRepository(db_client=self.db)
         self.scorer = PriorityScorer(grid_size_degrees=config.grid_size_degrees)
 
     def run(self) -> Dict[str, Any]:
@@ -54,13 +55,13 @@ class ForestSentinelAnalysis:
         logger.info("Initializing ForestSentinel Part 2 Analysis Pipeline...")
         start_time = datetime.now(timezone.utc)
 
-        # 1. Read fire detections from Firestore
-        logger.info("Step 1/5: Loading fire detections from Cloud Firestore...")
+        # 1. Read fire detections from Supabase
+        logger.info("Step 1/5: Loading fire detections from Supabase...")
         df = self.repository.load_fire_detections()
 
         # 2. Run Exploratory Data Analysis
         logger.info("Step 2/5: Performing Exploratory Data Analysis...")
-        analyzer = FireActivityAnalyzer(df)
+        analyzer = FireActivityAnalyzer(df, window_days=self.config.day_range)
         eda_results = analyzer.run_full_eda()
 
         # 3. Grid-Cell Hotspot Construction & Priority Scoring
@@ -87,14 +88,19 @@ class ForestSentinelAnalysis:
             grid_metadata=grid_metadata,
             artifact_paths=artifacts,
             reports_dir=self.config.reports_dir,
-            firebase_project_id=self.config.firebase_project_id,
+            database_project=self.config.database_project,
+        )
+
+        pdf_report = try_build(
+            build_analysis_pdf, load_json(json_report), charts_dir, json_report.with_suffix(".pdf"),
+            etl=latest_etl_report(self.config.reports_dir),
         )
 
         duration = round((datetime.now(timezone.utc) - start_time).total_seconds(), 2)
         logger.info("ForestSentinel Part 2 Analysis successfully completed in %.2fs!", duration)
 
         return {
-            "records_analyzed": len(df),
+            "records_analyzed": len(analyzer.df),
             "unique_dates_count": eda_results["overview"]["unique_detection_dates_count"],
             "grid_cells_analyzed": len(grid_df),
             "high_priority_cells": grid_metadata["high_priority_count"],
@@ -104,5 +110,6 @@ class ForestSentinelAnalysis:
             "map_path": str(artifacts["fire_activity_map"]),
             "json_report_path": str(json_report),
             "md_report_path": str(md_report),
+            "pdf_report_path": str(pdf_report) if pdf_report else None,
             "duration_seconds": duration,
         }

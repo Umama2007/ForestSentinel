@@ -1,30 +1,52 @@
 # ForestSentinel
 
-> A data-engineering and geospatial analytics platform that transforms NASA satellite fire detections into explainable fire-activity and conservation-exposure insights.
+> **NASA FIRMS active-fire ETL, explainable hotspot analysis, and privacy-safe biodiversity exposure intelligence for the Amazon Basin.**
 
-ForestSentinel is an end-to-end data pipeline and geospatial intelligence system designed for the Amazon Basin. It ingests near-real-time active-fire thermal anomalies from NASA FIRMS, validates data integrity using Pydantic v2 schemas, stores deduplicated records in Google Cloud Firestore, performs 0.25° spatial grid tessellation with explainable priority scoring, and integrates biodiversity occurrence records from GBIF with IUCN Red List conservation categories under strict wildlife privacy safeguards.
+ForestSentinel is an end-to-end data pipeline and geospatial intelligence system designed for the Amazon Basin. It ingests near-real-time active-fire thermal anomalies from NASA FIRMS, validates data integrity using Pydantic v2 schemas, stores deduplicated records in Google Supabase, performs 0.25° spatial grid tessellation with explainable priority scoring, and integrates biodiversity occurrence records from GBIF with IUCN Red List conservation categories under strict wildlife privacy safeguards.
 
 ---
 
 ## Project Status Badges
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
-![Database](https://img.shields.io/badge/Database-Firebase%20Cloud%20Firestore-orange?logo=firebase)
+![Database](https://img.shields.io/badge/Database-Supabase%20Postgres-3ECF8E?logo=supabase)
 ![Fire Data](https://img.shields.io/badge/Data%20Source-NASA%20FIRMS-red)
 ![Data Processing](https://img.shields.io/badge/Data%20Processing-Pandas-150458?logo=pandas)
 ![Validation](https://img.shields.io/badge/Validation-Pydantic%20v2-E92063?logo=pydantic)
 ![Biodiversity](https://img.shields.io/badge/Biodiversity-GBIF%20API-green)
-![Tests](https://img.shields.io/badge/Tests-68%20Passing-brightgreen?logo=pytest)
+![Dashboard](https://img.shields.io/badge/Dashboard-Flask%20Localhost-blueviolet?logo=flask)
+![Tests](https://img.shields.io/badge/Tests-75%20Passing-brightgreen?logo=pytest)
 ![License](https://img.shields.io/badge/License-To%20Be%20Added-lightgrey)
+
+> **GitHub Repository Topics:** `nasa-firms` · `geospatial` · `etl-pipeline` · `biodiversity` · `wildfire-detection` · `earth-observation` · `amazon-basin` · `supabase` · `pydantic` · `folium` · `gbif` · `iucn-red-list` · `flask` · `python`
 
 ---
 
 ## Key Outcomes & Verified Metrics
 
-All metrics below reflect real, verified executions against live services (NASA FIRMS, Cloud Firestore, and GBIF):
+All metrics below reflect the latest real executions against live services (NASA FIRMS, Cloud Firestore and GBIF), run on 25 Oct 2026. Numbers change with every FIRMS pull; the dashboard and PDF reports always show the current run.
 
 | Metric | Verified Live Result | Notes / Verification Source |
 |---|---:|---|
+| NASA FIRMS detections in latest pull | **146** | VIIRS NOAA-21 NRT, 5-day window 21–25 Oct 2026 |
+| Data validation pass rate | **100%** | 146 of 146 records passed cleaning and the Pydantic v2 schema |
+| Rejected records | **0** | Any failures would be stored in the `rejected_records` collection |
+| Duplicate prevention on rerun | **Verified** | Deterministic SHA-256 keys; e.g. the 3 Oct run skipped 77 records already stored |
+| Older records excluded from the study window | **667** | Firestore keeps every run; analysis uses only the latest 5-day window |
+| Populated 0.25° grid cells analysed | **38** | Amazon pilot bounding box `[-62, -10, -58, -6]` |
+| High-priority fire activity cells | **1** | Cell `grid_-10.00_-60.00` (score 82.2 / 100) |
+| Medium-priority fire activity cells | **7** | Scores 35.9 – 69.0 |
+| Low-priority fire activity cells | **30** | Score below 35 |
+| FRP outliers (Tukey IQR) | **10 (6.8%)** | Above the upper fence of 18.7 MW; median FRP 5.1 MW |
+| Medium/High cells queried in GBIF | **8** | Same cells as the Part 2 ranking |
+| GBIF animal occurrence records received | **728** | Non-animal records excluded |
+| Unique animal species identified | **256** | Deduplicated by taxon key and scientific name |
+| Aggregated species-grid records in Firestore | **336** | Saved to collection `species_grid_summaries` |
+| Species with verified IUCN status | **0** | `IUCN_API_TOKEN` not configured; reported as pending, never guessed |
+| Exact wildlife coordinates stored or mapped | **0** | Privacy rule enforced via schema sanitization |
+| Automated unit & integration tests | **75 passing** | Fully offline, about 15 s across Parts 1–3 and the PDF reports |
+
+---|---:|---|
 | NASA FIRMS detections ingested | **357** | Real NRT satellite observations (VIIRS NOAA-21) |
 | Data validation pass rate | **100%** | 357 records passed strict Pydantic v2 schema |
 | Duplicate prevention on rerun | **357 skipped** | Deterministic SHA-256 detection key prevents duplicate writes |
@@ -39,7 +61,7 @@ All metrics below reflect real, verified executions against live services (NASA 
 | Species falsely classified as threatened | **0** | Zero guessing; unverified statuses remain unranked |
 | Aggregated species-grid records in Firestore | **23** | Saved to collection `species_grid_summaries` |
 | Exact wildlife coordinates stored or mapped | **0** | Strict privacy rule enforced via schema sanitization |
-| Automated unit & integration tests | **68 passing** | 100% offline; execution time ~11s across Parts 1, 2, and 3 |
+| Automated unit & integration tests | **70 passing** | 100% offline; execution time ~11s across Parts 1, 2, and 3 |
 
 ---
 
@@ -84,7 +106,7 @@ Environmental satellite data and ecological biodiversity records are historicall
 
 ForestSentinel bridges the gap between satellite remote sensing and biodiversity data through an ethical, explainable data-engineering platform:
 - **Robust Pipeline:** Validates and cleans raw NASA FIRMS satellite observations and archives raw source data.
-- **Cloud Deduplication:** Stores detections in Google Cloud Firestore using deterministic SHA-256 keys to prevent duplicate records.
+- **Cloud Deduplication:** Stores detections in Supabase Postgres using deterministic SHA-256 primary keys to prevent duplicate records.
 - **Spatial Tessellation:** Divides the study region into 0.25° (~27.7 km) grid cells, aggregating frequency, recency, intensity (FRP), and confidence into an explainable **Fire Activity Priority Score (0–100)**.
 - **Privacy-Safe Conservation Intelligence:** Queries GBIF occurrences for elevated fire-activity cells, filters strictly for animal species, cross-references conservation statuses via the official IUCN Red List API v4, and scores potential exposure without ever storing or displaying point coordinates.
 - **Honest Scientific Guardrails:** The platform provides analytical decision support and never claims to predict wildfires, confirm animal mortality, or replace official emergency guidance.
@@ -99,7 +121,7 @@ ForestSentinel bridges the gap between satellite remote sensing and biodiversity
 flowchart LR
     A[NASA FIRMS API] --> B[ETL Pipeline]
     B --> C[Pandas & Pydantic v2]
-    C --> D[Firebase Cloud Firestore]
+    C --> D[Supabase Postgres]
     D --> E[EDA & Hotspot Tessellation]
     E --> F[Conservation Exposure Analysis]
     F --> G[Reports & Privacy-Safe Maps]
@@ -111,9 +133,9 @@ flowchart LR
 
 | Phase | Status | Capabilities |
 |---|---|---|
-| **Part 1 — Active-Fire ETL Pipeline** | **Complete** | NASA FIRMS NRT extraction, local CSV archive, Pandas cleaning, Pydantic v2 validation, Firestore persistence (`fire_detections`, `rejected_records`, `etl_runs`), deterministic SHA-256 deduplication. |
+| **Part 1 — Active-Fire ETL Pipeline** | **Complete** | NASA FIRMS NRT extraction, local CSV archive, Pandas cleaning, Pydantic v2 validation, Supabase persistence (`fire_detections`, `rejected_records`, `etl_runs`), deterministic SHA-256 deduplication. |
 | **Part 2 — Fire Activity Intelligence** | **Complete** | Exploratory Data Analysis, FRP combustion metrics, temporal hour/day analysis, 0.25° geographic grid tessellation, explainable Fire Activity Priority Score (0–100), static charts, interactive Folium HTML map. |
-| **Part 3 — Conservation Exposure Analysis** | **Complete** *(IUCN token optional)* | GBIF animal occurrence ingestion, species deduplication by taxon key, IUCN Red List v4 enrichment, explainable Conservation Exposure Score (0–100), Firestore collections (`species_grid_summaries`, `conservation_analysis_runs`, `conservation_assessments`), privacy-safe map overlay. |
+| **Part 3 — Conservation Exposure Analysis** | **Complete** *(IUCN token optional)* | GBIF animal occurrence ingestion, species deduplication by taxon key, IUCN Red List v4 enrichment, explainable Conservation Exposure Score (0–100), Supabase collections (`species_grid_summaries`, `conservation_analysis_runs`, `conservation_assessments`), privacy-safe map overlay. |
 
 ---
 
@@ -162,7 +184,7 @@ $$\text{Conservation Exposure Score} = \left( 0.45 \cdot \hat{S}_{\text{fire}} +
   2. `Verified Not Threatened`: Used only when IUCN verification succeeds and the returned category is not CR, EN, or VU (e.g. LC, NT, DD).
   3. `Verified Threatened`: Used only when IUCN verification succeeds and the category is CR, EN, or VU.
 - **Current Run Status:** No threatened-species classifications are available in this run because IUCN verification has not yet been configured. All 23 species-grid summaries are labeled `Pending IUCN Verification`.
-- **Zero Coordinates:** All wildlife data is strictly aggregated to 0.25° grid cells. Exact observation coordinates are never saved in Firestore, exported, reported, or mapped.
+- **Zero Coordinates:** All wildlife data is strictly aggregated to 0.25° grid cells. Exact observation coordinates are never saved in Supabase, exported, reported, or mapped.
 - **Potential Exposure, Not Harm:** This metric reflects potential spatial overlap, not confirmed animal injury or mortality.
 
 ---
@@ -174,7 +196,7 @@ $$\text{Conservation Exposure Score} = \left( 0.45 \cdot \hat{S}_{\text{fire}} +
 | **Satellite Fire Data** | NASA FIRMS NRT Area API | Near-real-time VIIRS/MODIS thermal anomaly ingestion |
 | **Data Engineering** | Python 3.10+, Requests, Pandas | Data extraction, CSV archiving, cleaning, coordinate validation |
 | **Data Validation** | Pydantic v2 | Strict schema validation, isolation of rejected records |
-| **Cloud Database** | Firebase Cloud Firestore | Document database with batch operations and deterministic keys |
+| **Cloud Database** | Supabase (Postgres) | Relational tables via the REST API, deterministic primary keys, row-level security |
 | **Statistical Analysis** | NumPy, SciPy | Min-max normalization, temporal binning, weight redistribution |
 | **Static Visualizations** | Matplotlib, Seaborn | High-resolution publication-quality PNG charts |
 | **Geospatial Mapping** | Folium (Leaflet.js) | Interactive HTML maps with 0.25° grid overlays and popup details |
@@ -188,7 +210,7 @@ $$\text{Conservation Exposure Score} = \left( 0.45 \cdot \hat{S}_{\text{fire}} +
 
 ```text
 ForestSentinel/
-├── .env.example                     # Environment template (FIRMS, Firebase, GBIF, IUCN)
+├── .env.example                     # Environment template (FIRMS, Supabase, GBIF, IUCN)
 ├── .gitignore                       # Git ignore rules protecting credentials, raw data & reports
 ├── pytest.ini                       # Pytest test discovery configuration
 ├── requirements.txt                 # Pinned project dependencies
@@ -211,11 +233,11 @@ ForestSentinel/
 │       ├── extractor.py             # NASA FIRMS API extraction and CSV archive
 │       ├── transformer.py           # Pandas cleaning, coordinate clipping, key generation
 │       ├── schemas.py               # Pydantic v2 FireDetection schema
-│       ├── firebase_client.py       # Firestore client wrapper and batch operations
+│       ├── supabase_client.py       # Supabase REST client: runs, detections, rejections
 │       ├── pipeline.py              # Part 1 ETL orchestration and logging setup
 │       ├── reporter.py              # Part 1 ETL audit report generator
 │       ├── analyzer.py              # Part 2 FireActivityAnalyzer (temporal, intensity, EDA)
-│       ├── analytics_repository.py  # Part 2 Firestore read-only data access layer
+│       ├── analytics_repository.py  # Part 2 read-only data access layer
 │       ├── priority_scoring.py      # Part 2 PriorityScorer (0.25° grid, explainable scoring)
 │       ├── visualizer.py            # Part 2 Matplotlib charts and Folium map generator
 │       ├── analysis_reporter.py     # Part 2 JSON & Markdown report generator
@@ -223,7 +245,7 @@ ForestSentinel/
 │       ├── iucn_client.py           # Part 3 IUCN Red List API v4 client and cache
 │       ├── conservation_scoring.py  # Part 3 ConservationScorer (0-100 explainable score)
 │       ├── conservation_analyzer.py # Part 3 ConservationAnalyzer (deduplication, enrichment)
-│       ├── conservation_repository.py # Part 3 Firestore repository (privacy-enforced)
+│       ├── conservation_repository.py # Part 3 Supabase repository (privacy-enforced)
 │       ├── conservation_visualizer.py # Part 3 ConservationVisualizer (charts & Folium map)
 │       ├── conservation_reporter.py # Part 3 JSON & Markdown audit report generator
 │       └── conservation_pipeline.py # Part 3 ConservationPipeline orchestration
@@ -232,7 +254,7 @@ ForestSentinel/
     ├── test_extractor.py
     ├── test_transformer.py
     ├── test_schemas.py
-    ├── test_firebase_client.py
+    ├── test_supabase_client.py
     ├── test_reporter.py
     ├── test_analyzer.py
     ├── test_analytics_repository.py
@@ -281,7 +303,7 @@ Copy `.env.example` to `.env`:
 cp .env.example .env
 ```
 
-Configure your credentials in `.env`:
+Create the database tables once by pasting [`supabase/schema.sql`](supabase/schema.sql) into the Supabase **SQL Editor** and clicking **Run**. Then configure your credentials in `.env`:
 
 ```env
 # NASA FIRMS API (Get free key: https://firms.modaps.eosdis.nasa.gov/api/map_key)
@@ -290,9 +312,9 @@ FIRMS_SOURCE=VIIRS_NOAA21_NRT
 AMAZON_BBOX=-62,-10,-58,-6
 DAY_RANGE=5
 
-# Firebase Cloud Firestore
-FIREBASE_SERVICE_ACCOUNT_PATH=secrets/firebase-service-account.json
-FIREBASE_PROJECT_ID=your_firebase_project_id_here
+# Supabase (Project URL + secret / service_role key)
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_secret_key_here
 
 # Grid Resolution & Logging
 GRID_SIZE_DEGREES=0.25
@@ -305,32 +327,52 @@ IUCN_API_TOKEN=optional_iucn_token_here
 IUCN_API_BASE_URL=https://api.iucnredlist.org
 ```
 
-> **Security Note:** `.env` and `secrets/*.json` are explicitly ignored by `.git`. Never commit API keys or service account credentials.
+> **Security Note:** `.env` is explicitly ignored by `.git`. Never commit API keys or the Supabase secret key — it bypasses row-level security.
 
 ---
 
 ## Pipeline Execution Commands
 
 ### Part 1: Extract, Validate & Ingest Active-Fire Detections
-Ingests real NASA FIRMS active fires, archives raw CSV, validates via Pydantic v2, and saves deduplicated records into Firestore:
+Ingests real NASA FIRMS active fires, archives raw CSV, validates via Pydantic v2, and saves deduplicated records into Supabase:
 ```bash
 python run_pipeline.py
 ```
 
 ### Part 2: Fire Activity EDA, Hotspot Tessellation & Priority Scoring
-Loads validated records from Firestore, computes intensity/temporal metrics, generates static charts, an interactive Folium map, and comprehensive audit reports:
+Loads validated records from Supabase, computes intensity/temporal metrics, generates static charts, an interactive Folium map, and comprehensive audit reports:
 ```bash
 python run_analysis.py
 ```
 
 ### Part 3: Conservation Exposure Analysis
-Recomputes priority zones, queries GBIF occurrences for Medium and High fire-activity cells, enriches with IUCN categories (where configured), computes Conservation Exposure scores, persists aggregated summaries to Firestore, and produces privacy-safe maps and reports:
+Recomputes priority zones, queries GBIF occurrences for Medium and High fire-activity cells, enriches with IUCN categories (where configured), computes Conservation Exposure scores, persists aggregated summaries to Supabase, and produces privacy-safe maps and reports:
 ```bash
 python run_conservation_analysis.py
 ```
 
+### Part 4: Interactive Web Dashboard (Local Prototype)
+Launches the local Flask dashboard:
+```bash
+python app.py
+```
+Open **`http://localhost:8000`**. Every figure is read from the latest reports via `/api/dashboard` (nothing is hardcoded), and the page follows the six EDA goals in order:
+
+1. **Data quality:** ETL record flow (extracted → duplicates → cleaning / Pydantic rejections → valid → inserted / skipped) and missing values
+2. **Distributions & outliers:** FRP, brightness I-4 and I-5 histograms with Tukey IQR fences, box plots and outlier counts; confidence breakdown
+3. **Timing:** detections per day, per hour (day/night passes), and day vs night FRP
+4. **Hotspots:** 0.25° grid cells ranked High / Medium / Low with score breakdown
+5. **Map:** embedded Folium fire-priority map and biodiversity overlay
+6. **Biodiversity:** GBIF species counts against fire priority per cell (flags when the GBIF run is older than the current ranking)
+
+It also includes the Matplotlib / Seaborn report figures, light and dark themes, and buttons to run each pipeline stage.
+
+**PDF reports.** Every pipeline stage also writes a designed PDF next to its JSON report (`reports/etl_report_*.pdf`, `reports/analysis_report_*.pdf`, `reports/conservation/<run>/conservation_report.pdf`). From the dashboard's *Reports* section you can download the latest ETL, Analysis or Biodiversity report, or the full **Project report** (problem, dataset, pipeline and all six EDA goals) at `http://localhost:8000/reports/project.pdf`.
+
+> Part 2 analyses only the last `DAY_RANGE` days of detections in Supabase (counted back from the latest detection), so records from older ETL runs don't inflate the study window.
+
 ### Run Full Test Suite
-Executes all 68 offline unit and integration tests:
+Executes all 75 offline unit and integration tests:
 ```bash
 python -m pytest -v
 ```
@@ -346,7 +388,7 @@ To maintain the highest standards of scientific and ethical integrity, ForestSen
 3. **Not a Wildfire Prediction Model:** The Fire Activity Priority Score is a retrospective analytical ranking of observed satellite detections. It does **not** predict fire propagation, wind-driven spread, or future ignition risks.
 4. **GBIF Records Indicate Past Occurrence, Not Current Presence:** GBIF records reflect historical biodiversity observations from research collections, citizen science, and surveys. A record demonstrates documented historical occurrence, not guaranteed current occupancy.
 5. **Verified IUCN Conservation Statuses Only:** IUCN Red List categories are displayed only when verified through the configured official IUCN API v4. ForestSentinel never guesses or scrapes unverified statuses.
-6. **Wildlife Privacy Enforcement:** To protect endangered species from poaching and illegal trafficking, point coordinates are strictly excluded from all Firestore collections, markdown reports, logs, and map popups. Wildlife data is aggregated solely to 0.25° grid cells.
+6. **Wildlife Privacy Enforcement:** To protect endangered species from poaching and illegal trafficking, point coordinates are strictly excluded from all Supabase collections, markdown reports, logs, and map popups. Wildlife data is aggregated solely to 0.25° grid cells.
 7. **Educational & Analytical Scope:** ForestSentinel is an educational, research-oriented decision-support tool. It does **not** provide official emergency, disaster-response, or evacuation guidance.
 
 ---
@@ -362,16 +404,16 @@ python -m pytest -v
 **Results:**
 - **68 passed tests** in **~11.3 seconds**
 - **Zero failures, zero warnings, 100% offline execution**
-- Mocked HTTP requests and in-memory Firestore fixtures prevent accidental external API calls during testing.
+- Mocked HTTP sessions prevent accidental external API or database calls during testing.
 
 **Verified Live System Components:**
 - NASA FIRMS API extraction and raw CSV archive (`data/raw/`)
-- Cloud Firestore connection (`forestsentinel-58520`) with atomic batch writes
+- Supabase connection (`advspndbkxswkloufnbu`) with batched, duplicate-safe REST inserts
 - SHA-256 deterministic key deduplication (skipping 357 duplicates on rerun)
 - Part 2 EDA metrics, 44 grid cells tessellated, static PNG charts, Folium HTML map
 - Part 3 live GBIF querying (31 occurrences received, 23 unique animal species)
 - Honest fallback when `IUCN_API_TOKEN` is unconfigured (0 false threatened species)
-- Firestore persistence of `species_grid_summaries` with zero point coordinates
+- Supabase persistence of `species_grid_summaries` with zero point coordinates
 
 ---
 
@@ -379,12 +421,13 @@ python -m pytest -v
 
 The following capabilities represent intentional extensions planned for future phases:
 
+- [x] **Local dashboard prototype complete:** Implemented with `app.py`, Flask server, embedded Folium geospatial maps, and analytics viewers (`static/`, `templates/`)
 - [ ] Integrate real-time weather data (ERA5 / Open-Meteo wind speed, relative humidity, temperature)
 - [ ] Incorporate satellite fuel-moisture and vegetation indices (NDVI / NDWI)
 - [ ] Train and evaluate an explainable machine learning fire-risk model
 - [ ] Ingest official Brazilian indigenous land and protected-area boundaries (FUNAI / ICMBio)
-- [ ] Develop a secure, role-based interactive web dashboard (Next.js / FastAPI)
 - [ ] Deploy scheduled automated ETL pipelines with cloud-native monitoring (Google Cloud Run / Cloud Functions)
+- [ ] Cloud deployment of production web dashboard with role-based access control and multi-tenant authentication
 
 ---
 
@@ -397,5 +440,5 @@ The following capabilities represent intentional extensions planned for future p
 - **NASA FIRMS**: Active fire data provided by LANCE / FIRMS operated by NASA ESDIS.
 - **GBIF**: Global Biodiversity Information Facility Occurrence Search API for global biodiversity data.
 - **IUCN**: International Union for Conservation of Nature Red List of Threatened Species.
-- **Google Cloud Firebase**: Cloud Firestore NoSQL document database infrastructure.
+- **Supabase**: hosted Postgres database infrastructure.
 - **Open-Source Python Ecosystem**: Built with Pandas, Pydantic, NumPy, Matplotlib, Seaborn, Folium, and Pytest.

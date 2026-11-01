@@ -1,24 +1,24 @@
 """Analytics Repository module for ForestSentinel.
 
 Provides read-only access to validated active-fire / thermal-anomaly detections
-stored in Firebase Cloud Firestore and loads them into a structured Pandas DataFrame.
+stored in the Supabase fire_detections table and loads them into a structured
+Pandas DataFrame.
 """
 
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
 
-from forestsentinel.firebase_client import FirebaseClient
+from forestsentinel.supabase_client import SupabaseClient
 
 logger = logging.getLogger(__name__)
 
 
 class NoDataError(Exception):
-    """Exception raised when no records are found in the fire_detections collection."""
+    """Exception raised when no records are found in the fire_detections table."""
 
 
 class AnalyticsRepository:
@@ -42,57 +42,49 @@ class AnalyticsRepository:
         "etl_run_id",
     ]
 
-    def __init__(self, firebase_client: FirebaseClient) -> None:
-        """Initialize with an existing authenticated FirebaseClient.
+    def __init__(self, db_client: SupabaseClient) -> None:
+        """Initialize with an existing authenticated SupabaseClient.
 
         Args:
-            firebase_client: Authenticated FirebaseClient instance.
+            db_client: Authenticated SupabaseClient instance.
         """
-        self.firebase_client = firebase_client
-        self.db = firebase_client.db
+        self.db_client = db_client
 
     def load_fire_detections(self, limit: Optional[int] = None) -> pd.DataFrame:
-        """Fetch validated fire detection documents from Firestore into a clean DataFrame.
+        """Fetch validated fire detection rows from Supabase into a clean DataFrame.
 
         Never writes, updates, or deletes existing data.
 
         Args:
-            limit: Optional maximum number of documents to read.
+            limit: Optional maximum number of rows to read.
 
         Returns:
             Pandas DataFrame containing validated active-fire detection records.
 
         Raises:
-            NoDataError: If the fire_detections collection is empty or non-existent.
+            NoDataError: If the fire_detections table is empty.
         """
-        logger.info("Reading validated fire detections from Cloud Firestore collection '%s'...", FirebaseClient.COLLECTION_DETECTIONS)
-        collection_ref = self.db.collection(FirebaseClient.COLLECTION_DETECTIONS)
+        logger.info("Reading validated fire detections from Supabase table '%s'...", SupabaseClient.TABLE_DETECTIONS)
 
-        query = collection_ref
-        if limit is not None and limit > 0:
-            query = query.limit(limit)
-
-        records: List[Dict[str, Any]] = []
         try:
-            # Stream documents for memory-efficient iteration
-            docs = query.stream()
-            for doc in docs:
-                data = doc.to_dict()
-                if data:
-                    records.append(data)
+            records: List[Dict[str, Any]] = self.db_client.select(
+                SupabaseClient.TABLE_DETECTIONS,
+                params={"order": "acq_datetime.desc"},
+                limit=limit if limit and limit > 0 else None,
+            )
         except Exception as exc:
-            logger.error("Failed to query Firestore fire_detections: %s", exc)
+            logger.error("Failed to query Supabase fire_detections: %s", exc)
             raise
 
         if not records:
             msg = (
-                "No Firestore fire_detections were found.\n"
+                "No fire_detections were found in the database.\n"
                 "Run Part 1 with 'python run_pipeline.py' before running Part 2 analysis."
             )
             logger.warning(msg)
             raise NoDataError(msg)
 
-        logger.info("Retrieved %d raw detection documents from Firestore.", len(records))
+        logger.info("Retrieved %d raw detection rows from Supabase.", len(records))
 
         # Convert to DataFrame
         df = pd.DataFrame(records)
