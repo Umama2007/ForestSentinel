@@ -1,12 +1,12 @@
 """Conservation Pipeline orchestration module for ForestSentinel.
 
 Coordinates Part 3 end-to-end execution:
-1. Recomputes Part 2 grid priority zones from validated fire detections in Cloud Firestore
+1. Recomputes Part 2 grid priority zones from validated fire detections in Supabase
 2. Queries GBIF Occurrence Search API for Medium and High priority fire grid cells
 3. Normalizes and deduplicates animal records into privacy-safe species summaries
 4. Enriches with IUCN Red List categories (when IUCN_API_TOKEN is configured)
 5. Computes explainable Conservation Exposure Priority Scores
-6. Persists aggregated summaries and audit metrics to Cloud Firestore
+6. Persists aggregated summaries and audit metrics to Supabase
 7. Renders privacy-safe charts and Folium map artifact
 8. Generates comprehensive JSON and Markdown audit reports
 """
@@ -25,9 +25,10 @@ from forestsentinel.analyzer import FireActivityAnalyzer
 from forestsentinel.config import Config, load_config
 from forestsentinel.conservation_analyzer import ConservationAnalyzer
 from forestsentinel.conservation_reporter import generate_conservation_report
+from forestsentinel.pdf_report import build_conservation_pdf, load_json, try_build
 from forestsentinel.conservation_repository import ConservationRepository
 from forestsentinel.conservation_visualizer import ConservationVisualizer
-from forestsentinel.firebase_client import FirebaseClient
+from forestsentinel.supabase_client import SupabaseClient
 from forestsentinel.gbif_client import GBIFClient
 from forestsentinel.iucn_client import IUCNClient
 from forestsentinel.priority_scoring import PriorityScorer
@@ -41,7 +42,7 @@ class ConservationPipeline:
     def __init__(
         self,
         config: Config,
-        firebase_client: Optional[FirebaseClient] = None,
+        db_client: Optional[SupabaseClient] = None,
         gbif_client: Optional[GBIFClient] = None,
         iucn_client: Optional[IUCNClient] = None,
     ) -> None:
@@ -49,17 +50,17 @@ class ConservationPipeline:
 
         Args:
             config: Validated Config instance.
-            firebase_client: Optional FirebaseClient instance.
+            db_client: Optional SupabaseClient instance.
             gbif_client: Optional GBIFClient instance.
             iucn_client: Optional IUCNClient instance.
         """
         self.config = config
-        self.fb_client = firebase_client or FirebaseClient(
-            service_account_path=config.firebase_service_account_path,
-            project_id=config.firebase_project_id,
+        self.db = db_client or SupabaseClient(
+            url=config.supabase_url,
+            service_role_key=config.supabase_service_role_key,
         )
-        self.analytics_repo = AnalyticsRepository(firebase_client=self.fb_client)
-        self.cons_repo = ConservationRepository(firebase_client=self.fb_client)
+        self.analytics_repo = AnalyticsRepository(db_client=self.db)
+        self.cons_repo = ConservationRepository(db_client=self.db)
 
         self.gbif_client = gbif_client or GBIFClient(
             max_records_per_grid=config.gbif_max_records_per_grid,
@@ -69,7 +70,7 @@ class ConservationPipeline:
         self.iucn_client = iucn_client or IUCNClient(
             api_token=config.iucn_api_token,
             base_url=config.iucn_api_base_url,
-            firestore_repository=self.cons_repo,
+            repository=self.cons_repo,
         )
 
         self.scorer = PriorityScorer(grid_size_degrees=config.grid_size_degrees)
@@ -88,17 +89,18 @@ class ConservationPipeline:
         start_time = datetime.now(timezone.utc)
         timestamp_str = start_time.strftime("%Y%m%d_%H%M%S")
 
-        # 1. Recompute Part 2 grid priority metrics from Firestore fire_detections
-        logger.info("Step 1/6: Recomputing fire-activity priority zones from Cloud Firestore...")
+        # 1. Recompute Part 2 grid priority metrics from Supabase fire_detections
+        logger.info("Step 1/6: Recomputing fire-activity priority zones from Supabase...")
         raw_detections = self.analytics_repo.load_fire_detections()
-        analyzer = FireActivityAnalyzer(raw_detections)
+        # Same study window as Part 2, so GBIF is queried for the cells the analysis ranked.
+        analyzer = FireActivityAnalyzer(raw_detections, window_days=self.config.day_range)
         enriched_detections = self.scorer.assign_grid_cells(analyzer.df)
         grid_df, grid_metadata = self.scorer.compute_grid_metrics(enriched_detections)
 
         priority_cells_df = self.analyzer.filter_priority_cells(grid_df)
         priority_cell_count = len(priority_cells_df)
 
-        # 2. Create Conservation Run Record in Firestore
+        # 2. Create Conservation Run Record in Supabase
         run_id = self.cons_repo.create_run({
             "source_fire_analysis_run": "recomputed_from_fire_detections",
             "grid_size_degrees": self.config.grid_size_degrees,
@@ -113,8 +115,8 @@ class ConservationPipeline:
                 grid_size_degrees=self.config.grid_size_degrees,
             )
 
-            # 4. Save Privacy-Safe Aggregated Summaries to Firestore
-            logger.info("Step 3/6: Persisting aggregated species summaries to Cloud Firestore...")
+            # 4. Save Privacy-Safe Aggregated Summaries to Supabase
+            logger.info("Step 3/6: Persisting aggregated species summaries to Supabase...")
             summaries_to_save = analysis_results.get("species_grid_summaries", [])
             saved_count = self.cons_repo.save_species_grid_summaries(
                 run_id=run_id,
@@ -139,14 +141,18 @@ class ConservationPipeline:
                 analysis_results=analysis_results,
                 artifact_paths=artifact_paths,
                 output_dir=run_output_dir,
-                firebase_project_id=self.config.firebase_project_id,
+                database_project=self.config.database_project,
                 run_id=run_id,
                 iucn_configured=self.iucn_client.is_configured,
             )
             artifact_paths["conservation_report_json"] = json_report
             artifact_paths["conservation_report_md"] = md_report
+            pdf_report = try_build(build_conservation_pdf, load_json(json_report), run_output_dir,
+                                   run_output_dir / "conservation_report.pdf")
+            if pdf_report:
+                artifact_paths["conservation_report_pdf"] = pdf_report
 
-            # 7. Finalize Run Record in Firestore
+            # 7. Finalize Run Record in Supabase
             finish_time = datetime.now(timezone.utc)
             self.cons_repo.update_run(run_id, {
                 "finished_at": finish_time.isoformat(),
@@ -188,5 +194,5 @@ class ConservationPipeline:
                     "error_message": str(exc),
                 })
             except Exception as update_err:
-                logger.error("Failed recording failure status in Firestore: %s", update_err)
+                logger.error("Failed recording failure status in Supabase: %s", update_err)
             raise

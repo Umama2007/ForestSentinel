@@ -3,129 +3,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ForestSentinel | Amazon Fire Intelligence & Conservation Analytics</title>
-  <meta name="description" content="Production-grade Amazon fire detection, explainable hotspot prioritization, and biodiversity conservation exposure intelligence platform.">
-  
+  <title>ForestSentinel | Amazon Fire EDA & Conservation Analytics</title>
+  <meta name="description" content="ETL and exploratory analysis of NASA FIRMS VIIRS active-fire detections over the Amazon, with 0.25° hotspot ranking and GBIF biodiversity comparison.">
+  <meta name="theme-color" content="#05070d">
+
   <!-- Modern Typography from Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <!-- Vanilla CSS Stylesheet -->
   <link rel="stylesheet" href="/static/css/dashboard.css">
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+
+  <!-- Ambient background: drifting orbs + engineered grid -->
+  <div class="ambient" aria-hidden="true">
+    <span class="orb orb-a"></span>
+    <span class="orb orb-b"></span>
+    <span class="orb orb-c"></span>
+    <span class="orb orb-d"></span>
+    <div class="grid-overlay"></div>
+    <div class="scanline"></div>
+  </div>
+
   <!-- Top Navigation Bar -->
-  <nav class="navbar">
+  <nav class="navbar" id="navbar">
     <a href="/" class="brand-wrapper">
-      <div class="brand-logo">🛡️</div>
-      <span class="brand-title">ForestSentinel</span>
-      <span class="brand-badge">Intelligence v1.0</span>
+      <span class="brand-logo">
+        <span class="brand-logo-ring"></span>
+        <span class="brand-logo-core">🛰️</span>
+      </span>
+      <span class="brand-text">
+        <span class="brand-title">ForestSentinel</span>
+        <span class="brand-badge">Fire EDA</span>
+      </span>
     </a>
-    
-    <div class="nav-links">
+
+    <div class="nav-links" id="nav-links">
       <a href="#overview" class="nav-link active">Overview</a>
-      <a href="#maps" class="nav-link">Interactive Maps</a>
-      <a href="#analytics" class="nav-link">Analytics</a>
-      <a href="#pipeline" class="nav-link">Control Center</a>
-      <a href="#methodology" class="nav-link">Methodology</a>
+      <a href="#quality" class="nav-link">Quality</a>
+      <a href="#distributions" class="nav-link">Distributions</a>
+      <a href="#timing" class="nav-link">Timing</a>
+      <a href="#hotspots" class="nav-link">Hotspots</a>
+      <a href="#maps" class="nav-link">Maps</a>
+      <a href="#biodiversity" class="nav-link">Biodiversity</a>
+      <a href="#reports" class="nav-link">Reports</a>
+      <a href="#pipeline" class="nav-link">Pipeline</a>
+      <span class="nav-glider" id="nav-glider" aria-hidden="true"></span>
     </div>
 
     <div class="nav-actions">
       <div class="pulse-badge">
         <span class="pulse-dot"></span>
-        <span>LIVE ON LOCALHOST:8000</span>
+        <span id="live-host">LIVE ON LOCALHOST</span>
       </div>
+      <button class="nav-burger" id="nav-burger" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </nav>
 
   <main class="container">
-    
+
     <!-- Hero Section -->
     <header class="hero-section" id="overview">
-      <div class="hero-tag">🛰️ Real-Time Amazon Environmental Monitoring</div>
-      <h1 class="hero-title">Amazon Wildfire Detection & Conservation Intelligence</h1>
-      <p class="hero-subtitle">
-        An end-to-end data pipeline integrating NASA FIRMS thermal anomaly detections, 0.25° spatial grid tessellation, explainable hotspot prioritization, and GBIF/IUCN biodiversity exposure analytics.
+      <div class="hero-spotlight" aria-hidden="true"></div>
+      <div class="hero-sheen" aria-hidden="true"></div>
+
+      <div class="hero-tag" data-reveal>
+        <span class="tag-dot"></span>
+        🛰️ Real-Time Amazon Environmental Monitoring
+      </div>
+
+      <h1 class="hero-title" aria-label="Amazon Wildfire Detection &amp; Conservation Intelligence">
+        <span class="word" style="--i:0"><span class="word-inner">Amazon</span></span>
+        <span class="word" style="--i:1"><span class="word-inner">Wildfire</span></span>
+        <span class="word" style="--i:2"><span class="word-inner grad">Detection</span></span>
+        <span class="word" style="--i:3"><span class="word-inner">&amp;</span></span>
+        <span class="word" style="--i:4"><span class="word-inner grad">Conservation</span></span>
+        <span class="word" style="--i:5"><span class="word-inner">Intelligence</span></span>
+      </h1>
+
+      <p class="hero-subtitle" data-reveal data-delay="420">
+        An end-to-end data pipeline integrating NASA FIRMS thermal anomaly detections, 0.25° spatial grid
+        tessellation, explainable hotspot prioritization, and GBIF/IUCN biodiversity exposure analytics.
       </p>
 
-      <div class="hero-meta-bar">
+      <div class="hero-cta" data-reveal data-delay="540">
+        <a href="#maps" class="btn-primary btn-magnetic">
+          <span class="btn-label">Explore Live Maps</span>
+          <span class="btn-arrow">→</span>
+          <span class="btn-fill" aria-hidden="true"></span>
+        </a>
+        <a href="#pipeline" class="btn-ghost btn-magnetic">
+          <span class="btn-label">Open Control Center</span>
+          <span class="btn-arrow">↘</span>
+        </a>
+      </div>
+
+      <div class="hero-meta-bar" data-reveal data-delay="640">
         <div class="meta-item">
-          <span>Target Area:</span>
-          <strong>Amazon Pilot Bounding Box ([-11.0, -64.0, -9.0, -62.0])</strong>
+          <span>Target Area</span>
+          <strong id="meta-area">Amazon Pilot Bounding Box</strong>
         </div>
         <div class="meta-item">
-          <span>Cloud Storage:</span>
-          <strong>Google Cloud Firestore (forestsentinel-58520)</strong>
+          <span>Cloud Storage</span>
+          <strong id="meta-storage">Supabase Postgres</strong>
         </div>
         <div class="meta-item">
-          <span>Verification Status:</span>
-          <strong style="color: var(--emerald-400);">68/68 Tests Passing (100%)</strong>
+          <span>Verification Status</span>
+          <strong class="ok">80/80 Tests Passing (100%)</strong>
         </div>
       </div>
     </header>
 
+    <!-- Live Signal Ticker -->
+    <div class="ticker" data-reveal aria-label="Live analysis metrics">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+
+    <div class="banner" id="load-error" hidden>
+      <span>⚠️</span>
+      <p><strong>No reports found.</strong> Run <code>python run_pipeline.py</code> then <code>python run_analysis.py</code>, or use the Control Center below.</p>
+    </div>
+
     <!-- KPI Metric Cards Grid -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-icon-wrap kpi-fire">🔥</div>
-        <div class="kpi-value">357</div>
-        <div class="kpi-label">Active Fire Detections</div>
-        <div class="kpi-subtext">100% Validated NASA FIRMS VIIRS & MODIS records</div>
+    <section class="kpi-grid" id="kpi-grid" aria-label="Key performance indicators"></section>
+
+    <!-- 01 Data quality -->
+    <section class="section-block" id="quality">
+      <div class="section-header" data-reveal>
+        <div class="section-title-wrap">
+          <span class="section-index">01</span>
+          <div>
+            <h2 class="section-title">Data Quality — Every Record Accounted For</h2>
+            <span class="section-sub">The latest FIRMS pull traced from extraction to Supabase. Bad records are stored separately, never silently dropped.</span>
+          </div>
+        </div>
+        <span class="section-badge" id="etl-meta">ETL run</span>
       </div>
 
-      <div class="kpi-card">
-        <div class="kpi-icon-wrap kpi-grid-cell">🌐</div>
-        <div class="kpi-value">44</div>
-        <div class="kpi-label">Populated Grid Cells</div>
-        <div class="kpi-subtext">0.25° Spatial tessellation with FRP aggregates</div>
-      </div>
+      <div class="grid-2-1">
+        <div class="chart-card" data-reveal data-delay="0">
+          <div class="chart-card-header">
+            <span class="chart-card-title">ETL Record Flow</span>
+            <span class="chip chip-emerald">Pandas · Pydantic</span>
+          </div>
+          <div class="panel-body"><div id="chart-funnel" class="funnel"></div></div>
+        </div>
 
-      <div class="kpi-card">
-        <div class="kpi-icon-wrap kpi-hotspot">⚡</div>
-        <div class="kpi-value">4</div>
-        <div class="kpi-label">High-Priority Hotspots</div>
-        <div class="kpi-subtext">Priority Score ≥ 70 (Max cell score: 89.0)</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon-wrap kpi-species">🐾</div>
-        <div class="kpi-value">23</div>
-        <div class="kpi-label">Species-Grid Summaries</div>
-        <div class="kpi-subtext">31 GBIF Animal Occurrences | Pending IUCN Verification</div>
-      </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon-wrap kpi-tests">🛡️</div>
-        <div class="kpi-value">68 / 68</div>
-        <div class="kpi-label">Test Suite Pass Rate</div>
-        <div class="kpi-subtext">Pytest Unit & Integration verification complete</div>
+        <div class="chart-card" data-reveal data-delay="90">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Missing Values</span>
+            <span class="chip chip-cyan">Study Window</span>
+          </div>
+          <div class="panel-body">
+            <table class="data-table compact" id="missing-table">
+              <thead><tr><th>Field</th><th class="num">Missing</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <ul class="notes" id="quality-notes"></ul>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Interactive Maps Section -->
-    <section class="section-block" id="maps">
-      <div class="section-header">
+    <!-- 02 Distributions -->
+    <section class="section-block" id="distributions">
+      <div class="section-header" data-reveal>
         <div class="section-title-wrap">
-          <h2 class="section-title">Interactive Geospatial Visualizer</h2>
-          <span class="section-badge">Folium / OpenStreetMap</span>
+          <span class="section-index">02</span>
+          <div>
+            <h2 class="section-title">Intensity, Brightness &amp; Outliers</h2>
+            <span class="section-sub">Fire Radiative Power and VIIRS brightness temperatures. Outliers lie beyond Tukey's fences: Q1 − 1.5·IQR or Q3 + 1.5·IQR.</span>
+          </div>
+        </div>
+        <span class="section-badge">Empirical Distributions</span>
+      </div>
+
+      <div class="grid-3" id="dist-cards"></div>
+
+      <div class="chart-card" data-reveal data-delay="120">
+        <div class="chart-card-header">
+          <span class="chart-card-title">Detection Confidence</span>
+          <span class="chip chip-amber">FIRMS VIIRS Class</span>
+        </div>
+        <div class="panel-body"><div id="chart-confidence"></div></div>
+      </div>
+    </section>
+
+    <!-- 03 Timing -->
+    <section class="section-block" id="timing">
+      <div class="section-header" data-reveal>
+        <div class="section-title-wrap">
+          <span class="section-index">03</span>
+          <div>
+            <h2 class="section-title">When Fires Are Detected</h2>
+            <span class="section-sub">Detections per day and per hour, and how day and night satellite passes differ.</span>
+          </div>
+        </div>
+        <span class="section-badge" id="trend-meta">Temporal Profile</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="chart-card" data-reveal data-delay="0">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Detections per Day</span>
+            <span class="chip chip-emerald">Daily</span>
+          </div>
+          <div class="panel-body"><div id="chart-daily" class="chart"></div></div>
+          <div class="chart-card-footer" id="trend-text"></div>
+        </div>
+
+        <div class="chart-card" data-reveal data-delay="90">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Detections per Hour · UTC</span>
+            <span class="legend" id="hour-legend"></span>
+          </div>
+          <div class="panel-body"><div id="chart-hourly" class="chart"></div></div>
+          <div class="chart-card-footer">VIIRS NOAA-21 overpasses cluster near 05 and 17 UTC (01 and 13 local time).</div>
         </div>
       </div>
 
-      <div class="map-card">
+      <div class="daynight" id="daynight"></div>
+    </section>
+
+    <!-- 04 Hotspots -->
+    <section class="section-block" id="hotspots">
+      <div class="section-header" data-reveal>
+        <div class="section-title-wrap">
+          <span class="section-index">04</span>
+          <div>
+            <h2 class="section-title">0.25° Grid Cells Ranked by Fire Priority</h2>
+            <span class="section-sub">The study area is divided into 0.25° grid cells (~27 km). Each populated cell gets an explainable 0–100 priority score.</span>
+          </div>
+        </div>
+        <span class="section-badge">Explainable Scoring</span>
+      </div>
+
+      <div class="hotspot-top">
+        <div class="priority-strip" id="priority-strip"></div>
+        <div class="chart-card footprint-card" data-reveal data-delay="120">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Hotspot Footprint</span>
+            <span class="legend" id="footprint-legend"></span>
+          </div>
+          <div id="footprint" class="footprint"></div>
+          <div class="chart-card-footer">Top-ranked cells · hover a cell, click to jump to its row</div>
+        </div>
+      </div>
+
+      <div class="chart-card" data-reveal data-delay="160">
+        <div class="chart-card-header">
+          <span class="chart-card-title">Top-Ranked Grid Cells</span>
+          <span class="chip chip-crimson" id="grid-meta">—</span>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="hotspot-table">
+            <thead>
+              <tr>
+                <th class="num">#</th>
+                <th>Grid cell</th>
+                <th>Priority</th>
+                <th class="score-col">Score</th>
+                <th class="num">Detections</th>
+                <th class="num">Last 48 h</th>
+                <th class="num">Days</th>
+                <th class="num">Mean FRP</th>
+                <th class="num">Max FRP</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 Interactive Maps -->
+    <section class="section-block" id="maps">
+      <div class="section-header" data-reveal>
+        <div class="section-title-wrap">
+          <span class="section-index">05</span>
+          <div>
+            <h2 class="section-title">Every Detection, on the Ground</h2>
+            <span class="section-sub">Folium map of each detection and its grid cell, coloured by priority. Switch layers to see GBIF records per cell.</span>
+          </div>
+        </div>
+        <span class="section-badge">Folium / OpenStreetMap</span>
+      </div>
+
+      <div class="map-card" data-reveal data-delay="120">
         <div class="map-controls-bar">
-          <div class="tab-pill-group">
-            <button class="tab-pill active" id="tab-fire">
-              <span>🔥</span> Fire Activity & Hotspot Priority
+          <div class="tab-pill-group" role="tablist">
+            <button class="tab-pill active" id="tab-fire" role="tab" aria-selected="true">
+              <span>🔥</span> Fire Priority
             </button>
-            <button class="tab-pill" id="tab-conservation">
-              <span>🌿</span> Conservation Exposure & Biodiversity Layer
+            <button class="tab-pill" id="tab-conservation" role="tab" aria-selected="false">
+              <span>🌿</span> Biodiversity
             </button>
           </div>
 
           <div class="map-action-btns">
-            <a href="/map/fire" target="_blank" class="btn-secondary" id="open-map-new-tab">
+            <a href="/map/fire" target="_blank" rel="noopener" class="btn-secondary" id="open-map-new-tab">
               <span>↗</span> Open In New Tab
             </a>
             <button class="btn-secondary" id="toggle-fullscreen">
@@ -135,101 +319,191 @@
         </div>
 
         <div class="map-frame-container" id="map-container">
-          <iframe id="map-frame" class="map-frame" src="/map/fire"></iframe>
+          <div class="map-loading" aria-hidden="true">
+            <span class="loader-ring"></span>
+            <em>Acquiring geospatial layer…</em>
+          </div>
+          <iframe id="map-frame" class="map-frame" src="/map/fire" title="ForestSentinel interactive map"></iframe>
         </div>
       </div>
     </section>
 
-    <!-- Analytics Charts Section -->
-    <section class="section-block" id="analytics">
-      <div class="section-header">
+    <!-- 06 Biodiversity -->
+    <section class="section-block" id="biodiversity">
+      <div class="section-header" data-reveal>
         <div class="section-title-wrap">
-          <h2 class="section-title">Exploratory Data Analysis & Empirical Distributions</h2>
-          <span class="section-badge">Verified Run Outputs</span>
+          <span class="section-index">06</span>
+          <div>
+            <h2 class="section-title">Fire Meets Wildlife</h2>
+            <span class="section-sub">GBIF animal records aggregated to the same cells as Medium and High fire-priority zones. Exact wildlife coordinates are never stored or shown.</span>
+          </div>
         </div>
+        <span class="section-badge" id="gbif-meta">GBIF · IUCN</span>
       </div>
 
-      <div class="charts-grid">
-        <div class="chart-card">
-          <div class="chart-card-header">
-            <span class="chart-card-title">Fire Radiative Power (FRP) Distribution</span>
-            <span style="font-size: 11px; color: var(--emerald-400);">Log-Normal Spread</span>
-          </div>
-          <div class="chart-card-body">
-            <img src="/static/assets/frp_distribution.png" alt="FRP Distribution Chart" title="Click to enlarge">
-          </div>
-          <div class="chart-card-footer">Mean FRP: 17.65 MW | Median FRP: 11.20 MW | Max FRP: 284.10 MW</div>
-        </div>
+      <div class="banner warn" id="gbif-stale" hidden>
+        <span>⚠️</span>
+        <p><strong>GBIF results are from an earlier hotspot ranking.</strong> The current analysis ranks different Medium/High cells. Run Part 3 to refresh.</p>
+      </div>
 
-        <div class="chart-card">
+      <div class="grid-1-2">
+        <div class="stat-stack" id="gbif-stats"></div>
+        <div class="chart-card" data-reveal data-delay="90">
           <div class="chart-card-header">
-            <span class="chart-card-title">Daily Fire Activity & Anomaly Frequency</span>
-            <span style="font-size: 11px; color: var(--amber-400);">Temporal Profile</span>
+            <span class="chart-card-title">Fire Priority vs Species Recorded</span>
+            <span class="chip chip-emerald">Privacy-Safe Aggregation</span>
           </div>
-          <div class="chart-card-body">
-            <img src="/static/assets/daily_fire_activity.png" alt="Daily Fire Activity Chart" title="Click to enlarge">
+          <div class="table-scroll">
+            <table class="data-table" id="gbif-table">
+              <thead>
+                <tr>
+                  <th>Grid cell</th>
+                  <th>Fire priority</th>
+                  <th class="score-col">Fire score</th>
+                  <th class="num">Detections</th>
+                  <th class="species-col">Animal species</th>
+                  <th>IUCN</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
-          <div class="chart-card-footer">Peak activity recorded on Sep 29, 2026 with 142 distinct fire anomalies</div>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-card-header">
-            <span class="chart-card-title">0.25° Grid Cell Hotspot Priority Distribution</span>
-            <span style="font-size: 11px; color: var(--crimson-400);">Explainable Scoring</span>
-          </div>
-          <div class="chart-card-body">
-            <img src="/static/assets/hotspot_priority_distribution.png" alt="Hotspot Priority Distribution" title="Click to enlarge">
-          </div>
-          <div class="chart-card-footer">4 High Priority (≥70) | 12 Medium Priority (40–69) | 28 Low Priority (&lt;40)</div>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-card-header">
-            <span class="chart-card-title">System Architecture & Multi-Source Ingestion</span>
-            <span style="font-size: 11px; color: var(--cyan-400);">Pipeline Topology</span>
-          </div>
-          <div class="chart-card-body">
-            <img src="/static/assets/architecture.png" alt="System Architecture Diagram" title="Click to enlarge">
-          </div>
-          <div class="chart-card-footer">NASA FIRMS ➔ Pandas/Pydantic ➔ Firestore ➔ GBIF/IUCN Enrichment</div>
         </div>
       </div>
     </section>
 
-    <!-- Control Center Section -->
+    <!-- 07 Report figures -->
+    <section class="section-block" id="figures">
+      <div class="section-header" data-reveal>
+        <div class="section-title-wrap">
+          <span class="section-index">07</span>
+          <div>
+            <h2 class="section-title">Report Figures</h2>
+            <span class="section-sub">Matplotlib and Seaborn charts generated by the latest pipeline runs. Click any chart to enlarge.</span>
+          </div>
+        </div>
+        <span class="section-badge">Verified Run Outputs</span>
+      </div>
+      <div class="charts-grid" id="figure-grid"></div>
+    </section>
+
+    <!-- 08 PDF Reports -->
+    <section class="section-block" id="reports">
+      <div class="section-header" data-reveal>
+        <div class="section-title-wrap">
+          <span class="section-index">08</span>
+          <div>
+            <h2 class="section-title">Take the Findings With You</h2>
+            <span class="section-sub">Printable PDF reports built from the latest runs — tables, written findings and every chart.</span>
+          </div>
+        </div>
+        <span class="section-badge">PDF · ReportLab</span>
+      </div>
+
+      <div class="report-grid">
+        <article class="kpi-card report report-main tilt" data-kind="project" data-reveal style="--accent: var(--emerald-400);">
+          <div class="kpi-sheen" aria-hidden="true"></div>
+          <div class="report-doc" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <div class="report-body">
+            <span class="chip chip-emerald">Recommended for Submission</span>
+            <h3>Project Report</h3>
+            <p>Problem, dataset and pipeline, then all six EDA goals: data quality, distributions and outliers, timing, hotspot ranking, map and GBIF comparison.</p>
+            <span class="report-meta" data-meta="project">—</span>
+            <div class="report-actions">
+              <a class="btn-primary btn-sm" href="/reports/project.pdf?download=1"><span class="btn-label">Download PDF</span><span class="btn-arrow">↓</span><span class="btn-fill" aria-hidden="true"></span></a>
+              <a class="btn-secondary" href="/reports/project.pdf" target="_blank" rel="noopener"><span>↗</span> Preview</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="kpi-card report tilt" data-kind="etl" data-reveal data-delay="80" style="--accent: var(--cyan-400);">
+          <div class="kpi-sheen" aria-hidden="true"></div>
+          <div class="kpi-icon-wrap kpi-tests">📥</div>
+          <h3>ETL Run</h3>
+          <p>Record flow from FIRMS to Supabase, rejections and run details.</p>
+          <span class="report-meta" data-meta="etl">—</span>
+          <div class="report-actions">
+            <a class="btn-secondary" href="/reports/etl.pdf?download=1"><span>↓</span> Download</a>
+            <a class="btn-secondary" href="/reports/etl.pdf" target="_blank" rel="noopener"><span>↗</span> Preview</a>
+          </div>
+        </article>
+
+        <article class="kpi-card report tilt" data-kind="analysis" data-reveal data-delay="160" style="--accent: var(--amber-400);">
+          <div class="kpi-sheen" aria-hidden="true"></div>
+          <div class="kpi-icon-wrap kpi-grid-cell">📊</div>
+          <h3>Analysis</h3>
+          <p>Distributions, outliers, timing and the 0.25° hotspot ranking with charts.</p>
+          <span class="report-meta" data-meta="analysis">—</span>
+          <div class="report-actions">
+            <a class="btn-secondary" href="/reports/analysis.pdf?download=1"><span>↓</span> Download</a>
+            <a class="btn-secondary" href="/reports/analysis.pdf" target="_blank" rel="noopener"><span>↗</span> Preview</a>
+          </div>
+        </article>
+
+        <article class="kpi-card report tilt" data-kind="biodiversity" data-reveal data-delay="240" style="--accent: var(--emerald-400);">
+          <div class="kpi-sheen" aria-hidden="true"></div>
+          <div class="kpi-icon-wrap kpi-species">🌿</div>
+          <h3>Biodiversity</h3>
+          <p>GBIF animal records for Medium and High fire-priority cells.</p>
+          <span class="report-meta" data-meta="biodiversity">—</span>
+          <div class="report-actions">
+            <a class="btn-secondary" href="/reports/biodiversity.pdf?download=1"><span>↓</span> Download</a>
+            <a class="btn-secondary" href="/reports/biodiversity.pdf" target="_blank" rel="noopener"><span>↗</span> Preview</a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 09 Control Center -->
     <section class="section-block" id="pipeline">
-      <div class="section-header">
+      <div class="section-header" data-reveal>
         <div class="section-title-wrap">
-          <h2 class="section-title">Pipeline Control Center & Real-Time Console</h2>
-          <span class="section-badge">Live Execution</span>
+          <span class="section-index">09</span>
+          <div>
+            <h2 class="section-title">Pipeline Control Center &amp; Real-Time Console</h2>
+            <span class="section-sub">Trigger ETL, analysis and biodiversity stages from the browser — the dashboard refreshes when a stage finishes</span>
+          </div>
         </div>
+        <span class="section-badge live"><i></i>Live Execution</span>
       </div>
 
-      <div class="control-panel">
+      <div class="control-panel" data-reveal data-delay="120">
         <div class="control-panel-grid">
           <div class="pipeline-actions-col">
-            <button class="pipeline-run-btn" onclick="triggerPipeline('etl')">
-              <div class="btn-icon">📥</div>
-              <div class="btn-content">
-                <h4>Run Part 1 ETL</h4>
-                <p>Extract NASA FIRMS, validate schemas, persist to Firestore</p>
-              </div>
+            <button class="pipeline-run-btn" data-stage="etl">
+              <span class="btn-icon">📥</span>
+              <span class="btn-content">
+                <span class="btn-title-row">
+                  <h4>Run Part 1 ETL</h4>
+                  <span class="btn-step">01</span>
+                </span>
+                <p>Extract NASA FIRMS, validate schemas, load to Supabase</p>
+              </span>
+              <span class="btn-run-arrow" aria-hidden="true">→</span>
             </button>
 
-            <button class="pipeline-run-btn" onclick="triggerPipeline('analysis')">
-              <div class="btn-icon">📊</div>
-              <div class="btn-content">
-                <h4>Run Part 2 Analytics</h4>
-                <p>Compute 0.25° grid aggregates, score hotspots, generate map</p>
-              </div>
+            <button class="pipeline-run-btn" data-stage="analysis">
+              <span class="btn-icon">📊</span>
+              <span class="btn-content">
+                <span class="btn-title-row">
+                  <h4>Run Part 2 Analysis</h4>
+                  <span class="btn-step">02</span>
+                </span>
+                <p>EDA, 0.25° grid scoring, charts and map</p>
+              </span>
+              <span class="btn-run-arrow" aria-hidden="true">→</span>
             </button>
 
-            <button class="pipeline-run-btn" onclick="triggerPipeline('conservation')">
-              <div class="btn-icon">🌿</div>
-              <div class="btn-content">
-                <h4>Run Part 3 Conservation</h4>
-                <p>Query GBIF biodiversity, apply tri-state IUCN model, save layer</p>
-              </div>
+            <button class="pipeline-run-btn" data-stage="conservation">
+              <span class="btn-icon">🌿</span>
+              <span class="btn-content">
+                <span class="btn-title-row">
+                  <h4>Run Part 3 Biodiversity</h4>
+                  <span class="btn-step">03</span>
+                </span>
+                <p>GBIF animal records for Medium/High priority cells</p>
+              </span>
+              <span class="btn-run-arrow" aria-hidden="true">→</span>
             </button>
           </div>
 
@@ -241,67 +515,119 @@
                 <span class="dot dot-green"></span>
               </div>
               <div class="terminal-title">forestsentinel@pipeline-worker:~</div>
-              <button class="btn-secondary" id="clear-terminal" style="padding: 2px 8px; font-size: 11px;">Clear</button>
+              <button class="btn-secondary btn-mini" id="clear-terminal">Clear</button>
             </div>
-            <pre class="terminal-body" id="terminal-output">ForestSentinel v1.0.0 Console Ready.
-Connected to Google Cloud Firestore (forestsentinel-58520).
-All 68/68 test suites validated.
-Ready for operator commands.</pre>
+            <pre class="terminal-body" id="terminal-output">ForestSentinel Console Ready.</pre>
+            <div class="terminal-footer">
+              <span class="term-chip">bash</span>
+              <span class="term-chip">utf-8</span>
+              <span class="term-status" id="term-status"><i></i> idle</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Methodology & Scientific Accuracy -->
+    <!-- 10 Methodology -->
     <section class="section-block" id="methodology">
-      <div class="section-header">
+      <div class="section-header" data-reveal>
         <div class="section-title-wrap">
-          <h2 class="section-title">Scientific Rigor & Conservation Methodology</h2>
-          <span class="section-badge">IUCN & GBIF Standards</span>
+          <span class="section-index">10</span>
+          <div>
+            <h2 class="section-title">How It Works</h2>
+            <span class="section-sub">How the data moves, and how the priority score is computed</span>
+          </div>
+        </div>
+        <span class="section-badge">IUCN &amp; GBIF Standards</span>
+      </div>
+
+      <ol class="flow" data-reveal>
+        <li><span class="flow-step">Extract</span><span class="flow-desc">FIRMS Area API via <code>requests</code>; raw CSV archived</span></li>
+        <li><span class="flow-step">Transform</span><span class="flow-desc">Pandas cleaning, UTC timestamps, SHA-256 key</span></li>
+        <li><span class="flow-step">Validate</span><span class="flow-desc">Pydantic v2; failures go to <code>rejected_records</code></span></li>
+        <li><span class="flow-step">Load</span><span class="flow-desc">Supabase Postgres, idempotent insert by key</span></li>
+        <li><span class="flow-step">Explore</span><span class="flow-desc">EDA, 0.25° grid scoring, Folium, GBIF</span></li>
+      </ol>
+
+      <div class="grid-2 method-row">
+        <div class="chart-card" data-reveal data-delay="0">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Priority Score Weights</span>
+            <span class="chip chip-crimson">0–100 Score</span>
+          </div>
+          <div class="panel-body"><div id="weights"></div></div>
+          <div class="chart-card-footer">Each component is min-max normalised across populated cells. High ≥ 70 · Medium 35–69.9 · Low &lt; 35.</div>
+        </div>
+
+        <div class="chart-card tilt" data-reveal data-delay="90">
+          <div class="chart-card-header">
+            <span class="chart-card-title">System Architecture</span>
+            <span class="chip chip-cyan">Pipeline Topology</span>
+          </div>
+          <div class="chart-card-body">
+            <img src="/static/assets/architecture.png" alt="System architecture diagram" data-zoom>
+            <span class="expand-hint" aria-hidden="true">⤢ Enlarge</span>
+          </div>
+          <div class="chart-card-footer">NASA FIRMS ➔ Pandas/Pydantic ➔ Supabase ➔ GBIF/IUCN Enrichment</div>
         </div>
       </div>
 
-      <div class="kpi-card" style="padding: 28px;">
-        <h3 style="font-family: var(--font-heading); font-size: 18px; margin-bottom: 12px; color: var(--emerald-400);">
-          Strict Tri-State Conservation Categorization
-        </h3>
-        <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
-          To prevent misinterpretation, ForestSentinel explicitly separates taxonomic presence from threat evaluation. When IUCN verification is absent or pending, the system prohibits defaulting to unthreatened or calculating unverified exposure scores:
-        </p>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
-          <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--amber-500);">
-            <strong style="color: var(--amber-400); display: block; margin-bottom: 4px;">1. Pending IUCN Verification</strong>
-            <span style="font-size: 12px; color: var(--text-muted);">Assigned when IUCN Red List verification has not yet run or is pending. Species exposure score is not calculated. (23 species in current run)</span>
-          </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--cyan-500);">
-            <strong style="color: var(--cyan-400); display: block; margin-bottom: 4px;">2. Verified Not Threatened</strong>
-            <span style="font-size: 12px; color: var(--text-muted);">Assigned only when IUCN verification succeeds and the species is categorized as Least Concern (LC) or Near Threatened (NT).</span>
-          </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--crimson-500);">
-            <strong style="color: var(--crimson-400); display: block; margin-bottom: 4px;">3. Verified Threatened</strong>
-            <span style="font-size: 12px; color: var(--text-muted);">Assigned only when IUCN verification confirms Vulnerable (VU), Endangered (EN), or Critically Endangered (CR) status.</span>
-          </div>
+      <div class="method-card" data-reveal data-delay="100">
+        <div class="method-head">
+          <h3>Strict Tri-State Conservation Categorization</h3>
+          <p>
+            ForestSentinel separates taxonomic presence from threat evaluation. When IUCN verification is absent
+            or pending, the system never defaults to "unthreatened" or calculates unverified exposure scores:
+          </p>
+        </div>
+
+        <div class="method-grid">
+          <article class="method-item method-pending">
+            <span class="method-num">01</span>
+            <strong>Pending IUCN Verification</strong>
+            <p id="method-pending-text">Assigned when IUCN Red List verification has not yet run or is pending. Species exposure score is not calculated.</p>
+          </article>
+          <article class="method-item method-safe">
+            <span class="method-num">02</span>
+            <strong>Verified Not Threatened</strong>
+            <p>Assigned only when IUCN verification succeeds and the species is categorized as Least Concern (LC) or Near Threatened (NT).</p>
+          </article>
+          <article class="method-item method-threat">
+            <span class="method-num">03</span>
+            <strong>Verified Threatened</strong>
+            <p>Assigned only when IUCN verification confirms Vulnerable (VU), Endangered (EN), or Critically Endangered (CR) status.</p>
+          </article>
+        </div>
+
+        <div class="method-note">
+          <span>⚠️</span>
+          <p><strong>Scientific notice:</strong> retrospective analytical ranking of recorded NASA FIRMS thermal anomalies — not a wildfire-prediction model, not an official emergency warning, and never a claim of confirmed animal mortality.</p>
         </div>
       </div>
     </section>
 
     <!-- Footer -->
     <footer class="dashboard-footer">
-      <div>
-        <span>ForestSentinel &copy; 2026. Built with Python, Flask, Pandas, Pydantic, Folium & Google Cloud Firestore.</span>
+      <div class="footer-left">
+        <span class="footer-brand">ForestSentinel</span>
+        <span>Data: NASA FIRMS, GBIF · Built with Python, Pandas, Pydantic, Supabase, Folium &amp; Flask.</span>
       </div>
-      <div>
-        <a href="https://github.com/Umama2007/ForestSentinel" target="_blank">GitHub Repository: Umama2007/ForestSentinel ↗</a>
+      <div class="footer-right">
+        <span class="footer-sources" id="footer-sources"></span>
       </div>
     </footer>
 
   </main>
 
+  <!-- Chart tooltip -->
+  <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+
   <!-- Modal for Full-Resolution Image Preview -->
-  <div class="modal-overlay" id="image-modal">
+  <div class="modal-overlay" id="image-modal" role="dialog" aria-modal="true" aria-label="Chart preview">
     <div class="modal-content">
-      <button class="modal-close" id="modal-close">&times;</button>
+      <button class="modal-close" id="modal-close" aria-label="Close preview">&times;</button>
       <img id="modal-img" src="" alt="Chart Preview">
+      <div class="modal-caption" id="modal-caption"></div>
     </div>
   </div>
 

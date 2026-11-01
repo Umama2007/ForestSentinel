@@ -95,7 +95,7 @@ def test_generate_conservation_report(tmp_path: Path, sample_analysis_data):
         analysis_results=sample_analysis_data,
         artifact_paths=artifact_paths,
         output_dir=tmp_path,
-        firebase_project_id="test-project-123",
+        database_project="test-project-123",
         run_id="test_run_001",
         iucn_configured=True,
     )
@@ -122,7 +122,7 @@ def test_generate_conservation_report(tmp_path: Path, sample_analysis_data):
 def test_repository_privacy_enforcement_rejects_coordinates():
     """Verify ConservationRepository strictly rejects forbidden coordinate fields."""
     mock_fb = MagicMock()
-    repo = ConservationRepository(firebase_client=mock_fb)
+    repo = ConservationRepository(db_client=mock_fb)
 
     # Record containing forbidden coordinates
     bad_record = {
@@ -149,7 +149,7 @@ def test_repository_privacy_enforcement_rejects_coordinates():
 def test_repository_sanitizer_preserves_permitted_aggregated_fields():
     """Verify ConservationRepository keeps permitted aggregated fields."""
     mock_fb = MagicMock()
-    repo = ConservationRepository(firebase_client=mock_fb)
+    repo = ConservationRepository(db_client=mock_fb)
 
     good_record = {
         "grid_id": "cell_1",

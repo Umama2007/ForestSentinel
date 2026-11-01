@@ -55,7 +55,7 @@ def render_architecture_diagram():
         # Col 1: Part 1 Ingestion
         (80, 520, 260, 130, "1. Ingestion & Raw Archive", "NASA FIRMS NRT Area API\nArea CSV Download & Hash Verification\nZero-Loss Local Storage", "Requests / Area API", "#E63946"),
         (400, 520, 260, 130, "2. Cleaning & Validation", "Pandas Coordinate / Time Cleaning\nPydantic v2 Schema Enforcement\nDefensive Rejection Isolation", "Pandas + Pydantic v2", "#FF6B35"),
-        (720, 520, 260, 130, "3. Cloud Persistence", "Firebase Cloud Firestore\nDeterministic SHA-256 Key Deduplication\nAtomic Batch Transactions", "Cloud Firestore", "#FFB703"),
+        (720, 520, 260, 130, "3. Cloud Persistence", "Supabase Postgres\nDeterministic SHA-256 Key Deduplication\nBatched REST Inserts", "Supabase", "#FFB703"),
 
         # Col 2: Part 2 Analytics
         (1040, 520, 260, 130, "4. Hotspot Tessellation", "0.25° Geographic Spatial Tessellation\nFrequency, Recency, FRP, Confidence\nExplainable Fire Priority (0-100)", "NumPy + PriorityScorer", "#2A9D8F"),

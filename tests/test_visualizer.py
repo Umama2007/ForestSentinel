@@ -49,7 +49,7 @@ def sample_analysis_data():
 
 
 def test_visualizer_produces_all_expected_files(tmp_path: Path, sample_analysis_data):
-    """Verify that Visualizer.render_all produces all 6 PNG charts and the Folium HTML map."""
+    """Verify that Visualizer.render_all produces all 9 PNG charts and the Folium HTML map."""
     enriched, grid_df, _ = sample_analysis_data
 
     vis = Visualizer(output_dir=tmp_path)
@@ -57,7 +57,10 @@ def test_visualizer_produces_all_expected_files(tmp_path: Path, sample_analysis_
 
     expected_keys = [
         "daily_fire_activity",
+        "hourly_activity",
         "confidence_distribution",
+        "brightness_distribution",
+        "outlier_boxplots",
         "frp_distribution",
         "day_night_distribution",
         "satellite_sensor_distribution",
@@ -135,7 +138,7 @@ def test_analysis_report_contains_limitation_statement(tmp_path: Path, sample_an
         grid_metadata=meta,
         artifact_paths=dummy_artifacts,
         reports_dir=tmp_path,
-        firebase_project_id="test-proj",
+        database_project="test-proj",
     )
 
     assert json_path.is_file()

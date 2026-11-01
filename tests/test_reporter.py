@@ -18,7 +18,7 @@ def test_generate_etl_report(tmp_path: Path):
         "api_source": "VIIRS_NOAA21_NRT",
         "study_bbox": "-62,-10,-58,-6",
         "day_range": 10,
-        "firebase_project_id": "test-forestsentinel",
+        "database_project": "test-forestsentinel",
         "counts": {
             "raw_rows_extracted": 100,
             "exact_duplicates_removed": 5,

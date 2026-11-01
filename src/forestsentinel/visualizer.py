@@ -20,8 +20,27 @@ import seaborn as sns
 
 logger = logging.getLogger(__name__)
 
-# ForestSentinel Design Palette
+# ForestSentinel Design Palette - dark theme matching the web dashboard
+# (emerald / cyan / amber / crimson on the dashboard's navy chart surface).
+# Legacy key names are kept so every chart picks up the new roles.
 PALETTE = {
+    "dark_green": "#34d399",          # primary accent (emerald)
+    "medium_green": "#10b981",        # secondary accent / fills
+    "bg_warm": "#080e1b",             # chart surface
+    "card_bg": "#0d1423",
+    "grid_line": "#1e293b",
+    "warning_amber": "#fbbf24",       # highlight (amber)
+    "high_priority_red": "#f87171",
+    "medium_priority": "#fbbf24",
+    "low_priority_green": "#64748b",
+    "day": "#fbbf24",
+    "night": "#22d3ee",
+    "dark_text": "#f8fafc",
+    "muted_gray": "#98a5ba",
+}
+
+# Light palette for the interactive Folium map (OpenStreetMap basemap).
+MAP_PALETTE = {
     "dark_green": "#274E3C",
     "medium_green": "#5C7F63",
     "bg_warm": "#F6F5EF",
@@ -52,16 +71,24 @@ class Visualizer:
         plt.rcParams.update({
             "figure.facecolor": PALETTE["bg_warm"],
             "axes.facecolor": PALETTE["bg_warm"],
-            "axes.edgecolor": PALETTE["medium_green"],
-            "axes.labelcolor": PALETTE["dark_text"],
+            "axes.edgecolor": PALETTE["grid_line"],
+            "axes.labelcolor": PALETTE["muted_gray"],
+            "axes.titlecolor": PALETTE["dark_text"],
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.axisbelow": True,
             "text.color": PALETTE["dark_text"],
-            "xtick.color": PALETTE["dark_text"],
-            "ytick.color": PALETTE["dark_text"],
+            "xtick.color": PALETTE["muted_gray"],
+            "ytick.color": PALETTE["muted_gray"],
             "font.family": "sans-serif",
             "font.sans-serif": ["Segoe UI", "DejaVu Sans", "Helvetica", "Arial"],
-            "grid.color": "#E3E0D3",
-            "grid.linestyle": "--",
-            "grid.alpha": 0.7,
+            "grid.color": PALETTE["grid_line"],
+            "grid.linestyle": "-",
+            "grid.alpha": 1.0,
+            "legend.facecolor": PALETTE["card_bg"],
+            "legend.edgecolor": PALETTE["grid_line"],
+            "legend.labelcolor": PALETTE["dark_text"],
+            "savefig.facecolor": PALETTE["bg_warm"],
         })
 
     def plot_daily_fire_activity(self, df: pd.DataFrame) -> Path:
@@ -118,14 +145,15 @@ class Visualizer:
         conf_counts = df["confidence"].fillna("unknown").value_counts().reset_index()
         conf_counts.columns = ["confidence", "count"]
 
+        # FIRMS VIIRS reports confidence as single letters (h / n / l).
         colors = [
-            PALETTE["high_priority_red"] if c == "high"
-            else PALETTE["warning_amber"] if c == "nominal"
-            else PALETTE["low_priority_green"]
+            "#34d399" if c in ("h", "high")
+            else "#22d3ee" if c in ("n", "nominal")
+            else "#475569"
             for c in conf_counts["confidence"].str.lower()
         ]
 
-        bars = ax.bar(conf_counts["confidence"], conf_counts["count"], color=colors, width=0.55, edgecolor="#FFFFFF")
+        bars = ax.bar(conf_counts["confidence"], conf_counts["count"], color=colors, width=0.55, edgecolor=PALETTE["bg_warm"])
 
         for bar in bars:
             height = bar.get_height()
@@ -168,7 +196,7 @@ class Visualizer:
                 bins=30,
                 kde=True,
                 color=PALETTE["warning_amber"],
-                edgecolor="#FFFFFF",
+                edgecolor=PALETTE["bg_warm"],
                 ax=ax,
             )
             mean_frp = frp_data.mean()
@@ -178,7 +206,7 @@ class Visualizer:
             ax.set_title("Fire Radiative Power (FRP) Distribution", fontsize=13, fontweight="bold", pad=14)
             ax.set_xlabel("Fire Radiative Power (Megawatts)", fontsize=10, labelpad=8)
             ax.set_ylabel("Frequency", fontsize=10, labelpad=8)
-            ax.legend(frameon=True, facecolor="#FFFFFF")
+            ax.legend(frameon=True, facecolor=PALETTE["card_bg"])
             ax.grid(True, axis="y")
 
         plt.tight_layout()
@@ -193,7 +221,7 @@ class Visualizer:
 
         dn_counts = df["daynight"].value_counts(dropna=False)
         labels = ["Day (D)" if str(k) == "D" else "Night (N)" if str(k) == "N" else "Unknown" for k in dn_counts.index]
-        colors = [PALETTE["warning_amber"], PALETTE["dark_green"], PALETTE["muted_gray"]][:len(labels)]
+        colors = [PALETTE["day"] if str(k) == "D" else PALETTE["night"] if str(k) == "N" else PALETTE["muted_gray"] for k in dn_counts.index]
 
         wedges, texts, autotexts = ax.pie(
             dn_counts.values,
@@ -201,7 +229,7 @@ class Visualizer:
             autopct="%1.1f%%",
             startangle=140,
             colors=colors,
-            wedgeprops={"edgecolor": "#FFFFFF", "linewidth": 2, "width": 0.45},
+            wedgeprops={"edgecolor": PALETTE["bg_warm"], "linewidth": 3, "width": 0.45},
             textprops={"fontsize": 10, "color": PALETTE["dark_text"]},
         )
         for autotext in autotexts:
@@ -212,6 +240,110 @@ class Visualizer:
         plt.tight_layout()
 
         output_path = self.output_dir / "day_night_distribution.png"
+        fig.savefig(output_path, dpi=200)
+        plt.close(fig)
+        return output_path
+
+    def plot_hourly_activity(self, df: pd.DataFrame) -> Path:
+        """Generate bar chart of detections per UTC hour, split into day and night passes."""
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        hourly = (
+            df.assign(daynight=df["daynight"].fillna("Unknown"))
+            .groupby(["detection_hour", "daynight"])
+            .size()
+            .unstack(fill_value=0)
+            .reindex(range(24), fill_value=0)
+        )
+        colors = {"D": PALETTE["day"], "N": PALETTE["night"], "Unknown": PALETTE["muted_gray"]}
+        names = {"D": "Day pass", "N": "Night pass", "Unknown": "Unknown"}
+
+        bottom = np.zeros(24)
+        for key in [k for k in ("D", "N", "Unknown") if k in hourly.columns]:
+            ax.bar(
+                hourly.index, hourly[key], bottom=bottom, width=0.7,
+                color=colors[key], edgecolor=PALETTE["bg_warm"], label=names[key],
+            )
+            bottom += hourly[key].values
+
+        ax.set_title("Detections by Hour of Day (UTC)", fontsize=13, fontweight="bold", pad=14)
+        ax.set_xlabel("Hour of acquisition (UTC)  ·  Amazon local time = UTC-4", fontsize=10, labelpad=8)
+        ax.set_ylabel("Detection Count", fontsize=10, labelpad=8)
+        ax.set_xticks(range(0, 24, 2))
+        ax.legend(frameon=True, facecolor=PALETTE["card_bg"])
+        ax.grid(True, axis="y")
+        plt.tight_layout()
+
+        output_path = self.output_dir / "hourly_activity.png"
+        fig.savefig(output_path, dpi=200)
+        plt.close(fig)
+        return output_path
+
+    def plot_brightness_distribution(self, df: pd.DataFrame) -> Path:
+        """Generate overlaid histograms of VIIRS I-4 and I-5 brightness temperatures."""
+        fig, ax = plt.subplots(figsize=(9, 5))
+
+        series = {
+            "I-4 (3.7 µm, fire channel)": (df.get("bright_ti4", pd.Series(dtype=float)).dropna(), PALETTE["high_priority_red"]),
+            "I-5 (11 µm, background)": (df.get("bright_ti5", pd.Series(dtype=float)).dropna(), PALETTE["dark_green"]),
+        }
+        if all(values.empty for values, _ in series.values()):
+            ax.text(
+                0.5, 0.5, "Brightness temperature data not available for this dataset.",
+                ha="center", va="center", fontsize=12, color=PALETTE["muted_gray"],
+            )
+        else:
+            for label, (values, color) in series.items():
+                if not values.empty:
+                    sns.histplot(values, bins=30, kde=True, color=color, alpha=0.45, edgecolor=PALETTE["bg_warm"], label=label, ax=ax)
+            ax.legend(frameon=True, facecolor=PALETTE["card_bg"])
+
+        ax.set_title("Brightness Temperature Distribution", fontsize=13, fontweight="bold", pad=14)
+        ax.set_xlabel("Brightness Temperature (Kelvin)", fontsize=10, labelpad=8)
+        ax.set_ylabel("Frequency", fontsize=10, labelpad=8)
+        ax.grid(True, axis="y")
+        plt.tight_layout()
+
+        output_path = self.output_dir / "brightness_distribution.png"
+        fig.savefig(output_path, dpi=200)
+        plt.close(fig)
+        return output_path
+
+    def plot_outlier_boxplots(self, df: pd.DataFrame) -> Path:
+        """Generate box plots (Tukey 1.5×IQR whiskers) for FRP and brightness to expose outliers."""
+        metrics = [
+            ("frp", "FRP (MW, log scale)"),
+            ("bright_ti4", "Brightness I-4 (K)"),
+            ("bright_ti5", "Brightness I-5 (K)"),
+        ]
+        fig, axes = plt.subplots(1, len(metrics), figsize=(13, 4.8))
+
+        for ax, (col, title) in zip(axes, metrics):
+            values = df[col].dropna() if col in df.columns else pd.Series(dtype=float)
+            if values.empty:
+                ax.text(0.5, 0.5, "No data", ha="center", va="center", color=PALETTE["muted_gray"])
+                ax.set_title(title, fontsize=11, fontweight="bold")
+                continue
+
+            sns.boxplot(
+                y=values, ax=ax, whis=1.5, width=0.4, color=PALETTE["medium_green"],
+                flierprops={"marker": "o", "markerfacecolor": PALETTE["high_priority_red"], "markeredgecolor": PALETTE["bg_warm"], "markersize": 6},
+                medianprops={"color": PALETTE["warning_amber"], "linewidth": 2},
+            )
+            if col == "frp" and values.min() > 0:
+                ax.set_yscale("log")
+
+            q1, q3 = values.quantile(0.25), values.quantile(0.75)
+            iqr = q3 - q1
+            n_out = int(((values < q1 - 1.5 * iqr) | (values > q3 + 1.5 * iqr)).sum())
+            ax.set_title(f"{title}\n{n_out} outliers ({n_out / len(values):.1%})", fontsize=11, fontweight="bold")
+            ax.set_ylabel("")
+            ax.grid(True, axis="y")
+
+        fig.suptitle("Outlier Detection — Tukey IQR Fences", fontsize=13, fontweight="bold")
+        plt.tight_layout()
+
+        output_path = self.output_dir / "outlier_boxplots.png"
         fig.savefig(output_path, dpi=200)
         plt.close(fig)
         return output_path
@@ -228,7 +360,7 @@ class Visualizer:
         )
         grouping["label"] = grouping["satellite"].fillna("Unknown") + " (" + grouping["instrument"].fillna("Unknown") + ")"
 
-        bars = ax.barh(grouping["label"], grouping["count"], color=PALETTE["medium_green"], edgecolor="#FFFFFF", height=0.55)
+        bars = ax.barh(grouping["label"], grouping["count"], color=PALETTE["medium_green"], edgecolor=PALETTE["bg_warm"], height=0.55)
 
         for bar in bars:
             width = bar.get_width()
@@ -262,8 +394,8 @@ class Visualizer:
         category_order = ["Low Priority", "Medium Priority", "High Priority"]
         cat_counts = grid_df["priority_label"].value_counts().reindex(category_order, fill_value=0)
 
-        bar_colors = [PALETTE["low_priority_green"], PALETTE["warning_amber"], PALETTE["high_priority_red"]]
-        bars1 = ax1.bar(category_order, cat_counts.values, color=bar_colors, edgecolor="#FFFFFF", width=0.5)
+        bar_colors = [PALETTE["low_priority_green"], PALETTE["medium_priority"], PALETTE["high_priority_red"]]
+        bars1 = ax1.bar(category_order, cat_counts.values, color=bar_colors, edgecolor=PALETTE["bg_warm"], width=0.5)
 
         for bar in bars1:
             h = bar.get_height()
@@ -285,11 +417,11 @@ class Visualizer:
         top_cells = grid_df.head(8)
         top_colors = [
             PALETTE["high_priority_red"] if lbl == "High Priority"
-            else PALETTE["warning_amber"] if lbl == "Medium Priority"
+            else PALETTE["medium_priority"] if lbl == "Medium Priority"
             else PALETTE["low_priority_green"]
             for lbl in top_cells["priority_label"]
         ]
-        bars2 = ax2.barh(top_cells["grid_id"], top_cells["priority_score"], color=top_colors, edgecolor="#FFFFFF", height=0.6)
+        bars2 = ax2.barh(top_cells["grid_id"], top_cells["priority_score"], color=top_colors, edgecolor=PALETTE["bg_warm"], height=0.6)
 
         for bar in bars2:
             w = bar.get_width()
@@ -348,10 +480,10 @@ class Visualizer:
         # Color mapping helper
         def get_color(label: str) -> str:
             if label == "High Priority":
-                return PALETTE["high_priority_red"]
+                return MAP_PALETTE["high_priority_red"]
             elif label == "Medium Priority":
-                return PALETTE["warning_amber"]
-            return PALETTE["low_priority_green"]
+                return MAP_PALETTE["warning_amber"]
+            return MAP_PALETTE["low_priority_green"]
 
         # 1. Add Grid Cell Rectangles
         grid_feature_group = folium.FeatureGroup(name="Hotspot Priority Grid Cells (0.25°)")
@@ -409,7 +541,7 @@ class Visualizer:
 
             popup_html = f"""
             <div style="font-family: Arial, sans-serif; font-size: 11px; width: 220px;">
-                <b style="color: {PALETTE['dark_green']}; font-size: 12px;">Active-Fire Detection</b><br>
+                <b style="color: {MAP_PALETTE['dark_green']}; font-size: 12px;">Active-Fire Detection</b><br>
                 <b>Observation:</b> {dt_str}<br>
                 <b>Coordinates:</b> {lat:.4f}, {lon:.4f}<br>
                 <b>Confidence:</b> {conf}<br>
@@ -451,19 +583,19 @@ class Visualizer:
             line-height: 1.5;
             max-width: 320px;
         ">
-            <h4 style="margin: 0 0 6px 0; color: {PALETTE['dark_green']}; font-size: 13px;">
+            <h4 style="margin: 0 0 6px 0; color: {MAP_PALETTE['dark_green']}; font-size: 13px;">
                 ForestSentinel Fire Priority Zones
             </h4>
             <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                <span style="background: {PALETTE['high_priority_red']}; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 2px;"></span>
+                <span style="background: {MAP_PALETTE['high_priority_red']}; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 2px;"></span>
                 <b>High Priority</b> (Score ≥ 70)
             </div>
             <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                <span style="background: {PALETTE['warning_amber']}; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 2px;"></span>
+                <span style="background: {MAP_PALETTE['warning_amber']}; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 2px;"></span>
                 <b>Medium Priority</b> (Score 35 – 69)
             </div>
             <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                <span style="background: {PALETTE['low_priority_green']}; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 2px;"></span>
+                <span style="background: {MAP_PALETTE['low_priority_green']}; width: 14px; height: 14px; display: inline-block; margin-right: 8px; border-radius: 2px;"></span>
                 <b>Low Priority</b> (Score &lt; 35)
             </div>
             <hr style="margin: 6px 0; border: 0; border-top: 1px solid #eee;">
@@ -487,7 +619,7 @@ class Visualizer:
         grid_df: pd.DataFrame,
         grid_size: float = 0.25,
     ) -> Dict[str, Path]:
-        """Generate all 6 static charts and the interactive Folium HTML map artifact.
+        """Generate all 9 static charts and the interactive Folium HTML map artifact.
 
         Returns:
             Dictionary mapping artifact names to their file paths.
@@ -496,8 +628,11 @@ class Visualizer:
 
         artifacts = {
             "daily_fire_activity": self.plot_daily_fire_activity(detections_df),
+            "hourly_activity": self.plot_hourly_activity(detections_df),
             "confidence_distribution": self.plot_confidence_distribution(detections_df),
             "frp_distribution": self.plot_frp_distribution(detections_df),
+            "brightness_distribution": self.plot_brightness_distribution(detections_df),
+            "outlier_boxplots": self.plot_outlier_boxplots(detections_df),
             "day_night_distribution": self.plot_day_night_distribution(detections_df),
             "satellite_sensor_distribution": self.plot_satellite_sensor_distribution(detections_df),
             "hotspot_priority_distribution": self.plot_hotspot_priority_distribution(grid_df),

@@ -1,6 +1,6 @@
 """Conservation Repository module for ForestSentinel.
 
-Manages Cloud Firestore storage for Part 3 conservation exposure analysis:
+Manages Supabase (Postgres) storage for Part 3 conservation exposure analysis:
 1. conservation_analysis_runs: metadata and audit counters per execution
 2. species_grid_summaries: privacy-safe aggregated species occurrence summaries per grid cell
 3. conservation_assessments: cached IUCN conservation categories
@@ -16,13 +16,13 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 import uuid
 
-from forestsentinel.firebase_client import FirebaseClient
+from forestsentinel.supabase_client import SupabaseClient
 
 logger = logging.getLogger(__name__)
 
 
 class ConservationRepository:
-    """Cloud Firestore repository for ForestSentinel conservation data."""
+    """Supabase repository for ForestSentinel conservation data."""
 
     COLLECTION_RUNS = "conservation_analysis_runs"
     COLLECTION_SUMMARIES = "species_grid_summaries"
@@ -57,17 +57,16 @@ class ConservationRepository:
         "key", "gbifID", "recordedBy", "collector", "raw_gbif", "verbatimLocality"
     }
 
-    def __init__(self, firebase_client: FirebaseClient) -> None:
-        """Initialize repository with FirebaseClient instance.
+    def __init__(self, db_client: SupabaseClient) -> None:
+        """Initialize repository with a SupabaseClient instance.
 
         Args:
-            firebase_client: Authenticated FirebaseClient instance.
+            db_client: Authenticated SupabaseClient instance.
         """
-        self.firebase_client = firebase_client
-        self.db = firebase_client.db
+        self.db_client = db_client
 
     def create_run(self, metadata: Dict[str, Any]) -> str:
-        """Create a new conservation analysis run document with status 'running'.
+        """Create a new conservation analysis run row with status 'running'.
 
         Args:
             metadata: Run configuration and start parameters.
@@ -79,6 +78,7 @@ class ConservationRepository:
         run_id = f"conservation_run_{timestamp_str}_{uuid.uuid4().hex[:6]}"
 
         run_doc = {
+            "run_id": run_id,
             "started_at": datetime.now(timezone.utc).isoformat(),
             "finished_at": None,
             "status": "running",
@@ -95,8 +95,8 @@ class ConservationRepository:
         }
 
         try:
-            self.db.collection(self.COLLECTION_RUNS).document(run_id).set(run_doc)
-            logger.info("Created conservation run record '%s' in Firestore.", run_id)
+            self.db_client.insert(self.COLLECTION_RUNS, [run_doc])
+            logger.info("Created conservation run record '%s' in Supabase.", run_id)
         except Exception as exc:
             logger.error("Failed to create conservation run record: %s", exc)
             raise
@@ -104,14 +104,14 @@ class ConservationRepository:
         return run_id
 
     def update_run(self, run_id: str, updates: Dict[str, Any]) -> None:
-        """Update fields on an existing conservation analysis run document.
+        """Update fields on an existing conservation analysis run row.
 
         Args:
             run_id: ID of the run document to update.
             updates: Dictionary of fields to update.
         """
         try:
-            self.db.collection(self.COLLECTION_RUNS).document(run_id).update(updates)
+            self.db_client.update(self.COLLECTION_RUNS, {"run_id": run_id}, updates)
             logger.info("Updated conservation run '%s' with status: %s", run_id, updates.get("status"))
         except Exception as exc:
             logger.error("Failed updating conservation run '%s': %s", run_id, exc)
@@ -133,13 +133,11 @@ class ConservationRepository:
         """
         doc_id = self._make_assessment_doc_id(scientific_name, taxon_key)
         try:
-            doc_ref = self.db.collection(self.COLLECTION_ASSESSMENTS).document(doc_id)
-            doc_snap = doc_ref.get()
-            if doc_snap.exists:
-                data = doc_snap.to_dict()
-                if data:
-                    data["iucn_source"] = "firestore_cache"
-                    return data
+            data = self.db_client.get_one(self.COLLECTION_ASSESSMENTS, "id", doc_id)
+            if data:
+                data.pop("id", None)
+                data["iucn_source"] = "database_cache"
+                return data
         except Exception as exc:
             logger.debug("Failed querying cached IUCN assessment '%s': %s", doc_id, exc)
 
@@ -156,6 +154,7 @@ class ConservationRepository:
         doc_id = self._make_assessment_doc_id(scientific_name, taxon_key)
 
         cache_doc = {
+            "id": doc_id,
             "taxon_key": taxon_key,
             "scientific_name": scientific_name,
             "iucn_category": assessment.get("iucn_category"),
@@ -166,7 +165,7 @@ class ConservationRepository:
         }
 
         try:
-            self.db.collection(self.COLLECTION_ASSESSMENTS).document(doc_id).set(cache_doc, merge=True)
+            self.db_client.insert(self.COLLECTION_ASSESSMENTS, [cache_doc], on_conflict="id", conflict="merge")
             logger.debug("Cached IUCN assessment for '%s' (%s)", scientific_name, doc_id)
         except Exception as exc:
             logger.warning("Failed saving cached IUCN assessment '%s': %s", doc_id, exc)
@@ -188,41 +187,40 @@ class ConservationRepository:
             batch_size: Maximum batch write size.
 
         Returns:
-            Number of documents successfully committed.
+            Number of rows successfully saved.
         """
         if not summaries:
             logger.info("No species grid summaries to save.")
             return 0
 
-        saved_count = 0
-        batches = [summaries[i:i + batch_size] for i in range(0, len(summaries), batch_size)]
-
-        for chunk_idx, chunk in enumerate(batches, 1):
-            batch = self.db.batch()
-            for record in chunk:
-                # Privacy verification
-                sanitized_record = self._sanitize_summary_record(record, run_id)
-                doc_id = self._make_summary_doc_id(
+        rows = []
+        for record in summaries:
+            # Privacy verification
+            sanitized_record = self._sanitize_summary_record(record, run_id)
+            rows.append({
+                "id": self._make_summary_doc_id(
                     grid_id=sanitized_record["grid_id"],
                     taxon_key=sanitized_record.get("taxon_key"),
                     scientific_name=sanitized_record.get("scientific_name", "")
-                )
-                doc_ref = self.db.collection(self.COLLECTION_SUMMARIES).document(doc_id)
-                batch.set(doc_ref, sanitized_record)
+                ),
+                "run_id": run_id,
+                "grid_id": sanitized_record["grid_id"],
+                "taxon_key": sanitized_record.get("taxon_key"),
+                "scientific_name": sanitized_record.get("scientific_name"),
+                "data": sanitized_record,
+                "saved_at": sanitized_record["created_at"],
+            })
 
-            try:
-                batch.commit()
-                saved_count += len(chunk)
-                logger.debug(
-                    "Committed species grid summary batch %d/%d (%d docs).",
-                    chunk_idx, len(batches), len(chunk)
-                )
-            except Exception as exc:
-                logger.error("Failed saving species grid summary batch %d: %s", chunk_idx, exc)
-                raise
+        try:
+            saved_count = self.db_client.insert(
+                self.COLLECTION_SUMMARIES, rows, on_conflict="id", conflict="merge", batch_size=batch_size
+            )
+        except Exception as exc:
+            logger.error("Failed saving species grid summaries: %s", exc)
+            raise
 
         logger.info(
-            "Successfully saved %d species grid summaries to Firestore collection '%s'.",
+            "Successfully saved %d species grid summaries to Supabase table '%s'.",
             saved_count, self.COLLECTION_SUMMARIES
         )
         return saved_count
@@ -237,7 +235,7 @@ class ConservationRepository:
             if forbidden in raw_summary:
                 raise ValueError(
                     f"PRIVACY VIOLATION DETECTED: Field '{forbidden}' must NEVER be stored in "
-                    f"Firestore '{self.COLLECTION_SUMMARIES}'!"
+                    f"the database table '{self.COLLECTION_SUMMARIES}'!"
                 )
 
         sanitized: Dict[str, Any] = {}
@@ -253,7 +251,7 @@ class ConservationRepository:
 
     @staticmethod
     def _make_assessment_doc_id(scientific_name: str, taxon_key: Optional[int] = None) -> str:
-        """Create deterministic document ID for IUCN assessment cache."""
+        """Create deterministic row ID for IUCN assessment cache."""
         if taxon_key is not None:
             return f"taxon_{taxon_key}"
         clean_name = re.sub(r"[^a-zA-Z0-9_]+", "_", scientific_name.strip().lower()).strip("_")
@@ -261,7 +259,7 @@ class ConservationRepository:
 
     @staticmethod
     def _make_summary_doc_id(grid_id: str, taxon_key: Optional[int], scientific_name: str) -> str:
-        """Create deterministic document ID for species_grid_summaries: grid_id_taxon_key."""
+        """Create deterministic row ID for species_grid_summaries: grid_id_taxon_key."""
         if taxon_key is not None:
             return f"{grid_id}_{taxon_key}"
         clean_name = re.sub(r"[^a-zA-Z0-9_]+", "_", scientific_name.strip().lower()).strip("_")

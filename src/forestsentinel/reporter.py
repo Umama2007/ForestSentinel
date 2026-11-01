@@ -1,7 +1,7 @@
 """Reporter module for ForestSentinel.
 
 Generates structured JSON and human-readable Markdown ETL quality audit reports
-documenting extraction, cleaning, Pydantic validation, and Firestore persistence metrics.
+documenting extraction, cleaning, Pydantic validation, and Supabase persistence metrics.
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ def generate_etl_report(
     api_source = summary_data.get("api_source", "N/A")
     study_bbox = summary_data.get("study_bbox", "N/A")
     day_range = summary_data.get("day_range", "N/A")
-    firebase_project = summary_data.get("firebase_project_id", "N/A")
+    database_project = summary_data.get("database_project", "N/A")
 
     counts = summary_data.get("counts", {})
     raw_extracted = counts.get("raw_rows_extracted", 0)
@@ -69,7 +69,7 @@ def generate_etl_report(
 
 ## 1. Executive Summary
 
-The **ForestSentinel** pipeline extracts satellite active-fire and thermal-anomaly detections from the **NASA FIRMS API**, cleans and transforms the data using **Pandas**, strictly validates normalized records against **Pydantic v2 schemas**, and persists data into **Google Firebase Cloud Firestore** with deterministic deduplication.
+The **ForestSentinel** pipeline extracts satellite active-fire and thermal-anomaly detections from the **NASA FIRMS API**, cleans and transforms the data using **Pandas**, strictly validates normalized records against **Pydantic v2 schemas**, and persists data into **Supabase (Postgres)** with deterministic deduplication.
 
 | Pipeline Metric | Value |
 | :--- | :--- |
@@ -78,7 +78,7 @@ The **ForestSentinel** pipeline extracts satellite active-fire and thermal-anoma
 | **Observation Window (Days)** | `{day_range}` |
 | **Execution Start (UTC)** | `{started_at}` |
 | **Execution Finish (UTC)** | `{finished_at}` |
-| **Firebase Project** | `{firebase_project}` |
+| **Supabase Project** | `{database_project}` |
 
 ---
 
@@ -102,7 +102,7 @@ The accounting below tracks every extracted row through deduplication, sanitizat
       ├── {pydantic_rejections} Pydantic Rejections (schema/range violations)
       │
       ▼  {valid_records} Validated Records
-[Firebase Cloud Firestore Storage]
+[Supabase (Postgres) Storage]
       ├── {inserted_records} New Detections Inserted
       └── {skipped_existing} Skipped Existing Records (Identical Detection Keys)
 ```
@@ -116,18 +116,18 @@ The accounting below tracks every extracted row through deduplication, sanitizat
 | **Transform** | Cleaning Rejections | **{clean_rejections}** | {f"{(clean_rejections/raw_extracted*100):.1f}%" if raw_extracted else "0.0%"} |
 | **Validate** | Pydantic Schema Rejections | **{pydantic_rejections}** | {f"{(pydantic_rejections/raw_extracted*100):.1f}%" if raw_extracted else "0.0%"} |
 | **Validate** | Valid Records Produced | **{valid_records}** | {f"{(valid_records/raw_extracted*100):.1f}%" if raw_extracted else "0.0%"} |
-| **Load** | Inserted into Firestore | **{inserted_records}** | {f"{(inserted_records/raw_extracted*100):.1f}%" if raw_extracted else "0.0%"} |
+| **Load** | Inserted into Supabase | **{inserted_records}** | {f"{(inserted_records/raw_extracted*100):.1f}%" if raw_extracted else "0.0%"} |
 | **Load** | Skipped Existing (Deduplicated) | **{skipped_existing}** | {f"{(skipped_existing/raw_extracted*100):.1f}%" if raw_extracted else "0.0%"} |
 
 ---
 
 ## 3. Database Persistence Architecture
 
-Data is stored in **Google Firebase Cloud Firestore** using the following collections:
+Data is stored in **Supabase (Postgres)** using the following tables:
 
 1. **`fire_detections`**:
    - Stores normalized, validated active-fire records.
-   - **Document ID**: `detection_key` (Deterministic SHA-256 hash computed from latitude, longitude, UTC observation datetime, satellite, instrument, and Fire Radiative Power).
+   - **Primary key**: `detection_key` (Deterministic SHA-256 hash computed from latitude, longitude, UTC observation datetime, satellite, instrument, and Fire Radiative Power).
    - This prevents duplicate records across overlapping or repeated ETL runs.
 2. **`rejected_records`**:
    - Stores unvalidated/corrupted records with original row number, raw payload, and exact failure reason.

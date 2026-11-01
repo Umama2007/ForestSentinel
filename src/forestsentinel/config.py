@@ -23,8 +23,8 @@ class Config:
     amazon_bbox: str
     bbox_coords: tuple[float, float, float, float]  # (west, south, east, north)
     day_range: int
-    firebase_service_account_path: Path
-    firebase_project_id: str
+    supabase_url: str
+    supabase_service_role_key: str
     log_level: str
     base_dir: Path
     raw_data_dir: Path
@@ -37,8 +37,18 @@ class Config:
     gbif_max_records_per_grid: int = 300
     gbif_request_timeout_seconds: int = 30
 
+    @property
+    def database_project(self) -> str:
+        """Supabase project reference (the subdomain of SUPABASE_URL), shown in reports."""
+        return self.supabase_url.split("//", 1)[-1].split(".", 1)[0]
+
     def redacted_repr(self) -> str:
         """Return a string representation with secrets masked for safe logging."""
+        supabase_masked = (
+            self.supabase_service_role_key[:10] + "..."
+            if len(self.supabase_service_role_key) > 14
+            else "***"
+        )
         key_masked = (
             self.nasa_firms_map_key[:4] + "..." + self.nasa_firms_map_key[-4:]
             if len(self.nasa_firms_map_key) > 8
@@ -56,8 +66,8 @@ class Config:
             f"east={self.bbox_coords[2]}, north={self.bbox_coords[3]}),\n"
             f"  day_range={self.day_range},\n"
             f"  grid_size_degrees={self.grid_size_degrees},\n"
-            f"  firebase_project_id={self.firebase_project_id},\n"
-            f"  firebase_service_account_path={self.firebase_service_account_path},\n"
+            f"  supabase_url={self.supabase_url},\n"
+            f"  supabase_service_role_key={supabase_masked},\n"
             f"  nasa_firms_map_key={key_masked},\n"
             f"  iucn_api_token={iucn_masked},\n"
             f"  iucn_api_base_url={self.iucn_api_base_url},\n"
@@ -189,20 +199,20 @@ def load_config(env_path: Optional[Path | str] = None, base_dir: Optional[Path] 
     day_range = _validate_day_range(os.getenv("DAY_RANGE", "5"))
     grid_size_degrees = _validate_grid_size(os.getenv("GRID_SIZE_DEGREES", "0.25"))
 
-    # Firebase configuration
-    service_account_str = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH", "secrets/firebase-service-account.json").strip()
-    service_account_path = Path(service_account_str)
-    if not service_account_path.is_absolute():
-        service_account_path = (base_dir / service_account_path).resolve()
-
-    firebase_project_id = os.getenv("FIREBASE_PROJECT_ID", "").strip()
-    if not firebase_project_id or firebase_project_id.lower() in {
-        "replace_with_your_firebase_project_id",
-        "your_project_id",
-    }:
+    # Supabase configuration
+    supabase_url = os.getenv("SUPABASE_URL", "").strip().rstrip("/")
+    if not supabase_url.startswith("https://"):
         raise ValueError(
-            "FIREBASE_PROJECT_ID is missing or set to placeholder.\n"
-            "Please configure your Firebase Project ID in your .env file."
+            "SUPABASE_URL is missing or invalid.\n"
+            "Copy the Project URL (e.g. https://abcdefgh.supabase.co) from Supabase -> "
+            "Project Settings -> Data API into your .env file."
+        )
+    supabase_service_role_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    if not supabase_service_role_key:
+        raise ValueError(
+            "SUPABASE_SERVICE_ROLE_KEY is missing.\n"
+            "Copy the secret (service_role) key from Supabase -> Project Settings -> API Keys "
+            "into your .env file."
         )
 
     log_level = os.getenv("LOG_LEVEL", "INFO").strip().upper()
@@ -253,8 +263,8 @@ def load_config(env_path: Optional[Path | str] = None, base_dir: Optional[Path] 
         amazon_bbox=formatted_bbox,
         bbox_coords=bbox_coords,
         day_range=day_range,
-        firebase_service_account_path=service_account_path,
-        firebase_project_id=firebase_project_id,
+        supabase_url=supabase_url,
+        supabase_service_role_key=supabase_service_role_key,
         log_level=log_level,
         base_dir=base_dir,
         raw_data_dir=raw_data_dir,

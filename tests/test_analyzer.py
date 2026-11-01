@@ -155,3 +155,71 @@ def test_missing_frp_handled_honestly():
     intensity = analyzer.analyze_fire_intensity()
     assert intensity["frp_available"] is False
     assert any("FRP" in note for note in analyzer.data_quality_notes)
+
+
+def test_analyze_distributions_flags_iqr_outliers():
+    """FRP values beyond Q3 + 1.5*IQR are counted as outliers; brightness is profiled too."""
+    frp = [5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 300.0]
+    df = pd.DataFrame({
+        "detection_key": [f"k{i}" for i in range(len(frp))],
+        "latitude": -8.0,
+        "longitude": -60.0,
+        "acq_datetime": "2026-09-26T17:00:00Z",
+        "satellite": "N21",
+        "instrument": "VIIRS",
+        "confidence": "n",
+        "daynight": ["D"] * 6 + ["N"] * 3,
+        "frp": frp,
+        "bright_ti4": [330.0 + i for i in range(len(frp))],
+    })
+
+    dist = FireActivityAnalyzer(df).analyze_distributions(bins=5)
+
+    assert dist["frp"]["outlier_count"] == 1
+    assert dist["frp"]["outlier_values"] == [300.0]
+    assert dist["frp"]["histogram"]["log_scale"] is True
+    assert sum(dist["frp"]["histogram"]["counts"]) == len(frp)
+    assert dist["bright_ti4"]["available"] is True
+    assert dist["bright_ti4"]["outlier_count"] == 0
+    assert dist["bright_ti5"]["available"] is False
+    assert set(dist["frp_by_daynight"]) == {"D", "N"}
+
+
+def test_window_days_excludes_records_from_older_runs():
+    """Only detections within the last N calendar days of the latest detection are analyzed."""
+    df = pd.DataFrame({
+        "detection_key": ["old", "edge", "new"],
+        "latitude": -8.0,
+        "longitude": -60.0,
+        "acq_datetime": ["2026-09-20T17:00:00Z", "2026-09-26T04:00:00Z", "2026-09-30T17:00:00Z"],
+        "satellite": "N21",
+        "instrument": "VIIRS",
+        "confidence": "n",
+        "daynight": "D",
+        "frp": [1.0, 2.0, 3.0],
+    })
+
+    analyzer = FireActivityAnalyzer(df, window_days=5)
+
+    assert analyzer.df["detection_key"].tolist() == ["edge", "new"]
+    assert any("outside the 5-day study window" in note for note in analyzer.data_quality_notes)
+
+
+def test_window_is_anchored_on_latest_pull_date():
+    """The window ends on the newest ingested_at date, matching the FIRMS DAY_RANGE query."""
+    df = pd.DataFrame({
+        "detection_key": ["older_run", "in_pull", "in_pull_2"],
+        "latitude": -8.0,
+        "longitude": -60.0,
+        "acq_datetime": ["2026-09-28T17:00:00Z", "2026-09-29T05:00:00Z", "2026-10-02T17:00:00Z"],
+        "ingested_at": ["2026-09-30T10:00:00Z", "2026-10-03T10:05:00Z", "2026-10-03T10:05:00Z"],
+        "satellite": "N21",
+        "instrument": "VIIRS",
+        "confidence": "n",
+        "daynight": "D",
+        "frp": [1.0, 2.0, 3.0],
+    })
+
+    analyzer = FireActivityAnalyzer(df, window_days=5)
+
+    assert analyzer.df["detection_key"].tolist() == ["in_pull", "in_pull_2"]

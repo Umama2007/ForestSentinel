@@ -1,6 +1,6 @@
 """ForestSentinel: Real-data satellite pipeline and analytical intelligence system.
 
-Part 1: Active-fire / thermal-anomaly ETL from NASA FIRMS to Firebase Cloud Firestore.
+Part 1: Active-fire / thermal-anomaly ETL from NASA FIRMS to Supabase (Postgres).
 Part 2: Exploratory Data Analysis, Hotspot Tessellation & Explainable Priority-Zone Scoring.
 """
 
@@ -19,7 +19,7 @@ from forestsentinel.conservation_repository import ConservationRepository
 from forestsentinel.conservation_scoring import ConservationScorer
 from forestsentinel.conservation_visualizer import ConservationVisualizer
 from forestsentinel.extractor import ExtractionError, FirmsExtractor
-from forestsentinel.firebase_client import FirebaseClient, FirebaseConfigError
+from forestsentinel.supabase_client import SupabaseClient, SupabaseConfigError
 from forestsentinel.gbif_client import GBIFAPIError, GBIFClient
 from forestsentinel.iucn_client import IUCNClient
 from forestsentinel.pipeline import ForestSentinelETL
@@ -39,8 +39,8 @@ __all__ = [
     "FirmsTransformer",
     "FireDetection",
     "validate_fire_records",
-    "FirebaseClient",
-    "FirebaseConfigError",
+    "SupabaseClient",
+    "SupabaseConfigError",
     "generate_etl_report",
     "ForestSentinelETL",
     # Part 2: Analytics & EDA

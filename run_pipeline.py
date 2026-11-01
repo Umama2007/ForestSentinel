@@ -2,7 +2,7 @@
 """ForestSentinel ETL Pipeline Runner.
 
 Part 1: Active-fire / thermal-anomaly data pipeline from NASA FIRMS API
-to Google Firebase Cloud Firestore.
+to Supabase (Postgres).
 
 Usage:
     python run_pipeline.py [--env-file PATH]
@@ -21,14 +21,14 @@ if str(SRC_PATH) not in sys.path:
 
 from forestsentinel.config import load_config
 from forestsentinel.extractor import ExtractionError
-from forestsentinel.firebase_client import FirebaseConfigError
+from forestsentinel.supabase_client import SupabaseConfigError
 from forestsentinel.pipeline import ForestSentinelETL, setup_logging
 
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(
-        description="ForestSentinel ETL: Ingest NASA FIRMS fire detections into Firebase Cloud Firestore."
+        description="ForestSentinel ETL: Ingest NASA FIRMS fire detections into Supabase (Postgres)."
     )
     parser.add_argument(
         "--env-file",
@@ -55,8 +55,8 @@ def main() -> int:
         print(f"  {val_err}\n")
         print("Action required:")
         print("  1. Copy .env.example to .env: copy .env.example .env (Windows) or cp .env.example .env (macOS/Linux)")
-        print("  2. Open .env and insert your real NASA_FIRMS_MAP_KEY and FIREBASE_PROJECT_ID.")
-        print("  3. Place your Firebase service account JSON in secrets/firebase-service-account.json\n")
+        print("  2. Open .env and insert your real NASA_FIRMS_MAP_KEY, SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.")
+        print("  3. Create the database tables by running supabase/schema.sql in the Supabase SQL Editor.\n")
         return 1
 
     # 2. Configure logging
@@ -67,9 +67,9 @@ def main() -> int:
     try:
         pipeline = ForestSentinelETL(config=config)
         summary = pipeline.run()
-    except FirebaseConfigError as fb_err:
-        print(f"\n[FIREBASE ERROR] Could not connect to Firebase Cloud Firestore:")
-        print(f"  {fb_err}\n")
+    except SupabaseConfigError as db_err:
+        print(f"\n[SUPABASE ERROR] Could not connect to Supabase (Postgres):")
+        print(f"  {db_err}\n")
         return 1
     except ExtractionError as ext_err:
         print(f"\n[EXTRACTION ERROR] NASA FIRMS API extraction halted:")
@@ -97,8 +97,8 @@ def main() -> int:
     print(f"Inserted: {inserted}")
     print(f"Rejected: {rejected}")
     print(f"Skipped existing: {skipped}")
-    print("Database: Firebase Cloud Firestore")
-    print(f"Collections: fire_detections, rejected_records, etl_runs")
+    print("Database: Supabase (Postgres)")
+    print(f"Tables: fire_detections, rejected_records, etl_runs")
     print(f"Report: {md_report}")
     print("=" * 70 + "\n")
 

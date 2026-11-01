@@ -19,14 +19,54 @@ logger = logging.getLogger(__name__)
 class FireActivityAnalyzer:
     """Performs Exploratory Data Analysis on validated active-fire detection records."""
 
-    def __init__(self, df: pd.DataFrame) -> None:
+    # Numeric columns profiled for distribution shape and IQR outliers.
+    DISTRIBUTION_METRICS = {
+        "frp": "Fire Radiative Power (MW)",
+        "bright_ti4": "Brightness Temperature I-4 (K)",
+        "bright_ti5": "Brightness Temperature I-5 (K)",
+    }
+
+    def __init__(self, df: pd.DataFrame, window_days: Optional[int] = None) -> None:
         """Initialize analyzer with a validated DataFrame and prepare analysis columns.
 
         Args:
-            df: Raw detection DataFrame loaded from Firestore.
+            df: Raw detection DataFrame loaded from Supabase.
+            window_days: If set, keep only detections from the last N calendar days of
+                the most recent FIRMS pull, i.e. the same window the FIRMS ``DAY_RANGE``
+                query covered. Supabase accumulates records across ETL runs, so this
+                keeps the EDA scoped to the study window instead of every record ever loaded.
         """
         self.raw_df = df.copy()
         self.df, self.data_quality_notes = self._prepare_data(self.raw_df)
+        self.window_days = window_days
+        if window_days:
+            self.df = self._restrict_to_window(self.df, window_days, self.data_quality_notes)
+
+    @staticmethod
+    def _restrict_to_window(df: pd.DataFrame, window_days: int, notes: List[str]) -> pd.DataFrame:
+        """Keep detections inside the ``window_days`` calendar days ending on the latest pull date.
+
+        The pull date is the newest ``ingested_at`` value (when the ETL ran); without it the
+        latest detection date is used instead.
+        """
+        valid_dts = df["acq_datetime"].dropna()
+        if valid_dts.empty:
+            return df
+        anchor = valid_dts.max()
+        if "ingested_at" in df.columns:
+            ingested = pd.to_datetime(df["ingested_at"], utc=True, errors="coerce").dropna()
+            if not ingested.empty:
+                anchor = ingested.max()
+        window_start = anchor.normalize() - pd.Timedelta(days=window_days - 1)
+        window_end = anchor.normalize() + pd.Timedelta(days=1)
+        in_window = (df["acq_datetime"] >= window_start) & (df["acq_datetime"] < window_end)
+        dropped = int((~in_window).sum())
+        if dropped:
+            notes.append(
+                f"{dropped} older database records fell outside the {window_days}-day study window "
+                f"(from {window_start.strftime('%Y-%m-%d')}) and were excluded from this analysis."
+            )
+        return df[in_window].copy()
 
     @staticmethod
     def _prepare_data(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
@@ -130,8 +170,12 @@ class FireActivityAnalyzer:
         hourly_counts_series = self.df.groupby("detection_hour").size()
         hourly_counts = {int(h): int(hourly_counts_series.get(h, 0)) for h in range(24)}
 
-        # Day vs Night
+        # Day vs Night, overall and per hour
         day_night_counts = self.df["daynight"].value_counts(dropna=False).to_dict()
+        hourly_by_daynight = {
+            str(dn): {int(h): int(group["detection_hour"].eq(h).sum()) for h in range(24)}
+            for dn, group in self.df.groupby(self.df["daynight"].fillna("unknown"))
+        }
 
         # Trend summary
         dates_sorted = sorted(daily_counts.keys())
@@ -169,6 +213,7 @@ class FireActivityAnalyzer:
             "daily_detections": daily_counts,
             "hourly_detections": hourly_counts,
             "day_night_distribution": day_night_counts,
+            "hourly_by_daynight": hourly_by_daynight,
             "trend_summary": trend_summary,
             "trend_explanation": trend_explanation,
         }
@@ -274,6 +319,77 @@ class FireActivityAnalyzer:
             "daynight_confidence": daynight_conf_crosstab,
         }
 
+    def analyze_distributions(self, bins: int = 20) -> Dict[str, Any]:
+        """Profile FRP and brightness distributions, flagging outliers with Tukey's IQR fences.
+
+        A value is an outlier when it lies below Q1 - 1.5*IQR or above Q3 + 1.5*IQR.
+        FRP is heavily right-skewed, so its histogram uses log-spaced bins.
+        """
+        results: Dict[str, Any] = {}
+        total = len(self.df)
+
+        for col, label in self.DISTRIBUTION_METRICS.items():
+            series = self.df[col].dropna() if col in self.df.columns else pd.Series(dtype=float)
+            if series.empty:
+                results[col] = {"available": False, "label": label}
+                continue
+
+            q1, median, q3 = (float(series.quantile(q)) for q in (0.25, 0.5, 0.75))
+            iqr = q3 - q1
+            lower_fence, upper_fence = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+            outliers = series[(series < lower_fence) | (series > upper_fence)]
+
+            log_scale = col == "frp" and float(series.min()) > 0
+            if log_scale:
+                edges = np.logspace(np.log10(series.min()), np.log10(series.max()), bins + 1)
+            else:
+                edges = np.linspace(series.min(), series.max(), bins + 1)
+            # Pin the outer edges exactly; logspace rounding can drop the max value.
+            edges[0], edges[-1] = series.min(), series.max()
+            counts, edges = np.histogram(series, bins=edges)
+
+            results[col] = {
+                "available": True,
+                "label": label,
+                "count": int(series.count()),
+                "missing": int(total - series.count()),
+                "min": round(float(series.min()), 2),
+                "q1": round(q1, 2),
+                "median": round(median, 2),
+                "mean": round(float(series.mean()), 2),
+                "q3": round(q3, 2),
+                "max": round(float(series.max()), 2),
+                "std": round(float(series.std()), 2) if len(series) > 1 else 0.0,
+                "skewness": round(float(series.skew()), 2) if len(series) > 2 else 0.0,
+                "iqr": round(iqr, 2),
+                "lower_fence": round(lower_fence, 2),
+                "upper_fence": round(upper_fence, 2),
+                "outlier_count": int(len(outliers)),
+                "outlier_percentage": round(len(outliers) / len(series) * 100, 2),
+                "outlier_values": [round(float(v), 2) for v in outliers.sort_values(ascending=False).head(25)],
+                "histogram": {
+                    "log_scale": log_scale,
+                    "edges": [round(float(e), 3) for e in edges],
+                    "counts": [int(c) for c in counts],
+                },
+            }
+
+        # FRP split by day/night — night fires are typically smaller but persistent.
+        if "daynight" in self.df.columns and self.df["frp"].notna().any():
+            results["frp_by_daynight"] = (
+                self.df.groupby("daynight")["frp"]
+                .agg(mean="mean", median="median", count="count", max="max")
+                .round(2)
+                .to_dict(orient="index")
+            )
+
+        results["missing_values"] = {
+            col: int(self.df[col].isna().sum())
+            for col in ["latitude", "longitude", "acq_datetime", "frp", "bright_ti4", "bright_ti5", "confidence", "daynight"]
+            if col in self.df.columns
+        }
+        return results
+
     def analyze_spatial_bounds(self) -> Dict[str, Any]:
         """Compute bounding extents and spatial center of the active-fire observations."""
         lat_valid = self.df["latitude"].dropna()
@@ -299,6 +415,7 @@ class FireActivityAnalyzer:
             "temporal": self.analyze_temporal(),
             "intensity": self.analyze_fire_intensity(),
             "sensors": self.analyze_confidence_and_sensors(),
+            "distributions": self.analyze_distributions(),
             "spatial_bounds": self.analyze_spatial_bounds(),
             "data_quality_notes": self.data_quality_notes,
         }

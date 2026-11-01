@@ -21,8 +21,25 @@ import seaborn as sns
 
 logger = logging.getLogger(__name__)
 
-# ForestSentinel Conservation Design Palette
+# ForestSentinel Conservation Design Palette - dark theme matching the web dashboard.
 PALETTE = {
+    "dark_green": "#34d399",
+    "medium_green": "#22d3ee",
+    "bg_warm": "#080e1b",
+    "warning_amber": "#fbbf24",       # Medium fire priority
+    "high_priority_red": "#f87171",
+    "low_priority_green": "#64748b",
+    "dark_text": "#f8fafc",
+    "muted_gray": "#98a5ba",
+    "cr_red": "#ef4444",
+    "en_orange": "#fb923c",
+    "vu_yellow": "#facc15",
+    "card_bg": "#0d1423",
+    "grid_line": "#1e293b",
+}
+
+# Light palette for the interactive Folium map (OpenStreetMap basemap).
+MAP_PALETTE = {
     "dark_green": "#274E3C",
     "medium_green": "#5C7F63",
     "bg_warm": "#F6F5EF",
@@ -58,16 +75,24 @@ class ConservationVisualizer:
         plt.rcParams.update({
             "figure.facecolor": PALETTE["bg_warm"],
             "axes.facecolor": PALETTE["bg_warm"],
-            "axes.edgecolor": PALETTE["medium_green"],
-            "axes.labelcolor": PALETTE["dark_text"],
+            "axes.edgecolor": PALETTE["grid_line"],
+            "axes.labelcolor": PALETTE["muted_gray"],
+            "axes.titlecolor": PALETTE["dark_text"],
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.axisbelow": True,
             "text.color": PALETTE["dark_text"],
-            "xtick.color": PALETTE["dark_text"],
-            "ytick.color": PALETTE["dark_text"],
+            "xtick.color": PALETTE["muted_gray"],
+            "ytick.color": PALETTE["muted_gray"],
             "font.family": "sans-serif",
             "font.sans-serif": ["Segoe UI", "DejaVu Sans", "Helvetica", "Arial"],
             "grid.color": PALETTE["grid_line"],
-            "grid.linestyle": "--",
-            "grid.alpha": 0.6,
+            "grid.linestyle": "-",
+            "grid.alpha": 1.0,
+            "legend.facecolor": PALETTE["card_bg"],
+            "legend.edgecolor": PALETTE["grid_line"],
+            "legend.labelcolor": PALETTE["dark_text"],
+            "savefig.facecolor": PALETTE["bg_warm"],
         })
 
     def render_threatened_species_by_category(
@@ -89,7 +114,7 @@ class ConservationVisualizer:
         counts = [int(threatened_by_cat.get(k, 0)) for k in keys]
         bar_colors = [PALETTE["cr_red"], PALETTE["en_orange"], PALETTE["vu_yellow"]]
 
-        bars = ax.bar(categories, counts, color=bar_colors, width=0.5, edgecolor=PALETTE["dark_text"], linewidth=1.2)
+        bars = ax.bar(categories, counts, color=bar_colors, width=0.5, edgecolor=PALETTE["bg_warm"], linewidth=1.2)
 
         # Label bars
         max_val = max(counts) if counts else 0
@@ -127,7 +152,7 @@ class ConservationVisualizer:
                 va="center",
                 fontsize=10,
                 color=PALETTE["muted_gray"],
-                bbox=dict(boxstyle="round,pad=0.5", facecolor="#FFF", edgecolor=PALETTE["muted_gray"], alpha=0.9),
+                bbox=dict(boxstyle="round,pad=0.5", facecolor=PALETTE["card_bg"], edgecolor=PALETTE["muted_gray"], alpha=0.9),
             )
 
         plt.tight_layout()
@@ -165,8 +190,8 @@ class ConservationVisualizer:
         x = np.arange(len(zones))
         width = 0.35
 
-        b1 = ax.bar(x - width/2, total_counts, width, label="All Animal Species Recorded", color=PALETTE["medium_green"], edgecolor=PALETTE["dark_text"], linewidth=1.1)
-        b2 = ax.bar(x + width/2, threatened_counts, width, label="Verified Threatened Species", color=PALETTE["high_priority_red"], edgecolor=PALETTE["dark_text"], linewidth=1.1)
+        b1 = ax.bar(x - width/2, total_counts, width, label="All Animal Species Recorded", color=PALETTE["medium_green"], edgecolor=PALETTE["bg_warm"], linewidth=1.1)
+        b2 = ax.bar(x + width/2, threatened_counts, width, label="Verified Threatened Species", color=PALETTE["high_priority_red"], edgecolor=PALETTE["bg_warm"], linewidth=1.1)
 
         ax.set_xticks(x)
         ax.set_xticklabels(zones, fontweight="bold", fontsize=10)
@@ -177,7 +202,7 @@ class ConservationVisualizer:
             fontweight="bold",
             pad=14,
         )
-        ax.legend(frameon=True, facecolor="#FFF", edgecolor=PALETTE["grid_line"], fontsize=9)
+        ax.legend(frameon=True, facecolor=PALETTE["card_bg"], edgecolor=PALETTE["grid_line"], fontsize=9)
         ax.grid(axis="y")
 
         max_val = max(total_counts + threatened_counts) if (total_counts + threatened_counts) else 0
@@ -241,8 +266,8 @@ class ConservationVisualizer:
         y = np.arange(len(cell_ids))
         height = 0.38
 
-        b1 = ax.barh(y - height/2, fire_scores, height, label="Fire Activity Priority Score (Part 2)", color=PALETTE["warning_amber"], edgecolor=PALETTE["dark_text"], linewidth=1.1)
-        b2 = ax.barh(y + height/2, cons_scores, height, label="Conservation Exposure Priority Score (Part 3)", color=PALETTE["high_priority_red"], edgecolor=PALETTE["dark_text"], linewidth=1.1)
+        b1 = ax.barh(y - height/2, fire_scores, height, label="Fire Activity Priority Score (Part 2)", color=PALETTE["warning_amber"], edgecolor=PALETTE["bg_warm"], linewidth=1.1)
+        b2 = ax.barh(y + height/2, cons_scores, height, label="Conservation Exposure Priority Score (Part 3)", color=PALETTE["high_priority_red"], edgecolor=PALETTE["bg_warm"], linewidth=1.1)
 
         ax.set_yticks(y)
         ax.set_yticklabels(cell_ids, fontsize=9)
@@ -254,7 +279,7 @@ class ConservationVisualizer:
             fontweight="bold",
             pad=14,
         )
-        ax.legend(frameon=True, facecolor="#FFF", edgecolor=PALETTE["grid_line"], fontsize=9, loc="lower right")
+        ax.legend(frameon=True, facecolor=PALETTE["card_bg"], edgecolor=PALETTE["grid_line"], fontsize=9, loc="lower right")
         ax.grid(axis="x")
 
         for b in list(b1) + list(b2):
@@ -316,7 +341,7 @@ class ConservationVisualizer:
             PALETTE["muted_gray"],
         ]
 
-        bars = ax.bar(labels, values, color=colors, width=0.5, edgecolor=PALETTE["dark_text"], linewidth=1.2)
+        bars = ax.bar(labels, values, color=colors, width=0.5, edgecolor=PALETTE["bg_warm"], linewidth=1.2)
 
         max_val = max(values) if values else 0
         ax.set_ylim(0, max(max_val * 1.15, 10))
@@ -410,15 +435,15 @@ class ConservationVisualizer:
 
             # Style by fire priority
             if priority_lbl == "High Priority":
-                fill_color = PALETTE["high_priority_red"]
+                fill_color = MAP_PALETTE["high_priority_red"]
                 fill_opacity = 0.40
                 weight = 2
             elif priority_lbl == "Medium Priority":
-                fill_color = PALETTE["warning_amber"]
+                fill_color = MAP_PALETTE["warning_amber"]
                 fill_opacity = 0.30
                 weight = 1.5
             else:
-                fill_color = PALETTE["low_priority_green"]
+                fill_color = MAP_PALETTE["low_priority_green"]
                 fill_opacity = 0.15
                 weight = 1
 
@@ -452,7 +477,7 @@ class ConservationVisualizer:
 
                 # If cell has threatened species or was analyzed
                 has_threatened = threatened_cnt > 0
-                stroke_color = PALETTE["cr_red"] if has_threatened else PALETTE["medium_green"]
+                stroke_color = MAP_PALETTE["cr_red"] if has_threatened else MAP_PALETTE["medium_green"]
 
                 cons_popup_html = f"""
                 <div style="font-family: sans-serif; font-size: 12px; width: 260px; line-height: 1.4;">

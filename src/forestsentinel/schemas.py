@@ -113,7 +113,7 @@ class FireDetection(BaseModel):
         return s if s else None
 
     def to_storage_dict(self) -> Dict[str, Any]:
-        """Convert model to a dictionary suitable for Firestore storage (ISO strings for datetimes)."""
+        """Convert model to a dictionary suitable for Supabase storage (ISO strings for datetimes)."""
         d = self.model_dump()
         d["acq_datetime"] = self.acq_datetime.isoformat()
         d["ingested_at"] = self.ingested_at.isoformat()

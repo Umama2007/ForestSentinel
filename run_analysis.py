@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ForestSentinel Part 2: Fire Activity EDA, Hotspot & Priority-Zone Analysis Runner.
 
-Reads validated active-fire records from Firebase Cloud Firestore, computes
+Reads validated active-fire records from Supabase (Postgres), computes
 Exploratory Data Analysis metrics, performs geographic grid-cell hotspot scoring,
 and renders static charts, Folium HTML map, and comprehensive audit reports.
 
@@ -23,7 +23,7 @@ if str(SRC_PATH) not in sys.path:
 from forestsentinel.analysis_pipeline import ForestSentinelAnalysis
 from forestsentinel.analytics_repository import NoDataError
 from forestsentinel.config import load_config
-from forestsentinel.firebase_client import FirebaseConfigError
+from forestsentinel.supabase_client import SupabaseConfigError
 from forestsentinel.pipeline import setup_logging
 
 
@@ -65,12 +65,12 @@ def main() -> int:
     try:
         pipeline = ForestSentinelAnalysis(config=config)
         results = pipeline.run()
-    except FirebaseConfigError as fb_err:
-        print(f"\n[FIREBASE ERROR] Could not initialize Firebase Cloud Firestore:")
-        print(f"  {fb_err}\n")
+    except SupabaseConfigError as db_err:
+        print(f"\n[SUPABASE ERROR] Could not initialize Supabase (Postgres):")
+        print(f"  {db_err}\n")
         return 1
     except NoDataError as nd_err:
-        print(f"\n[NO DATA ERROR] Firestore collection empty:")
+        print(f"\n[NO DATA ERROR] fire_detections table empty:")
         print(f"  {nd_err}\n")
         return 1
     except Exception as exc:
@@ -81,7 +81,7 @@ def main() -> int:
     # 4. Print Concise Final Terminal Summary
     print("\n" + "=" * 72)
     print("ForestSentinel Part 2 analysis completed successfully.")
-    print(f"Firestore records analyzed: {results['records_analyzed']}")
+    print(f"Database records analyzed: {results['records_analyzed']}")
     print(f"Unique detection dates: {results['unique_dates_count']}")
     print(f"Grid cells analyzed: {results['grid_cells_analyzed']}")
     print(f"High-priority cells: {results['high_priority_cells']}")
