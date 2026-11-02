@@ -48,13 +48,16 @@ secrets/*.json
 # Data files & generated outputs
 data/raw/*.csv
 data/processed/
-reports/*.json
-reports/*.md
 reports/*.pdf
 reports/pdf/
-reports/charts/
-reports/conservation/
 logs/*.log
+
+# Track verified reports, charts, and maps for live production deployment
+!reports/*.json
+!reports/*.md
+!reports/charts/**
+!reports/conservation/**
+
 
 # Tracked documentation assets
 !docs/assets/*.png

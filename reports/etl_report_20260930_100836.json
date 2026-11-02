@@ -1,0 +1,23 @@
+{
+  "run_id": "run_20260930_100826_a47419",
+  "status": "completed",
+  "started_at": "2026-09-30T10:08:26.999659+00:00",
+  "finished_at": "2026-09-30T10:08:35.806637+00:00",
+  "duration_seconds": 8.81,
+  "api_source": "VIIRS_NOAA21_NRT",
+  "study_bbox": "-62.0,-10.0,-58.0,-6.0",
+  "day_range": 5,
+  "firebase_project_id": "forestsentinel-58520",
+  "raw_csv_saved_at": "D:\\P4AI\\data\\raw\\firms_20260930_100830.csv",
+  "counts": {
+    "raw_rows_extracted": 357,
+    "exact_duplicates_removed": 0,
+    "cleaning_rejections": 0,
+    "pydantic_rejections": 0,
+    "valid_records": 357,
+    "inserted_records": 357,
+    "skipped_existing_records": 0,
+    "saved_rejections": 0
+  },
+  "rejected_sample": []
+}

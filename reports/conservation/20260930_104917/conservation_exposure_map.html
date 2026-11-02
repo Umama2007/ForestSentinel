@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_a2e04203f06de1a36c01fa1198d86c18 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+        <div style="
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            width: 380px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid #78877E;
+            border-left: 5px solid #274E3C;
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-family: sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #1E2A22;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 9999;
+        ">
+            <strong style="color: #274E3C; font-size: 12px;">🛡️ ForestSentinel Conservation Exposure Layer</strong><br/>
+            <span style="font-size: 10.5px; color: #333;">
+                Species information is aggregated to 0.25° grid cells for privacy and reflects recorded biodiversity occurrences, not confirmed current presence. Conservation exposure is an analytical indicator, not proof of harm.
+            </span>
+        </div>
+        
+    
+            <div class="folium-map" id="map_a2e04203f06de1a36c01fa1198d86c18" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_a2e04203f06de1a36c01fa1198d86c18 = L.map(
+                "map_a2e04203f06de1a36c01fa1198d86c18",
+                {
+                    center: [-7.920454545454546, -60.1875],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 7,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_a2e04203f06de1a36c01fa1198d86c18);
+
+            
+
+        
+    
+            var tile_layer_d92690b08eb79d52da4683a579d1e819 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_d92690b08eb79d52da4683a579d1e819.addTo(map_a2e04203f06de1a36c01fa1198d86c18);
+        
+    
+            var feature_group_bbe496f37d5f0ccbe790693f57b29306 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var rectangle_6f537cf5fe115ade5232a29ce9e97202 = L.rectangle(
+                [[-8.0, -61.25], [-7.75, -61.0]],
+                {"bubblingMouseEvents": true, "color": "#B8473F", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#B8473F", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_cf98924e88aeca5d960598d4be7ea92d = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_8a233a5b96f5e6f2e01d8e9e3f34da63 = $(`<div id="html_8a233a5b96f5e6f2e01d8e9e3f34da63" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-8.00_-61.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> High Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 72.2 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 64</p>             </div>             </div>`)[0];
+                popup_cf98924e88aeca5d960598d4be7ea92d.setContent(html_8a233a5b96f5e6f2e01d8e9e3f34da63);
+            
+        
+
+        rectangle_6f537cf5fe115ade5232a29ce9e97202.bindPopup(popup_cf98924e88aeca5d960598d4be7ea92d)
+        ;
+
+        
+    
+    
+            var rectangle_49edcc89c22e6f74615ff607a0074d6b = L.rectangle(
+                [[-10.0, -60.75], [-9.75, -60.5]],
+                {"bubblingMouseEvents": true, "color": "#D79A32", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#D79A32", "fillOpacity": 0.3, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_5976a4865f7c2678e7103d7d041dd5dd = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_dd3c185c6725c2c8093563e2b2af6581 = $(`<div id="html_dd3c185c6725c2c8093563e2b2af6581" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-10.00_-60.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Medium Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 57.6 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 35</p>             </div>             </div>`)[0];
+                popup_5976a4865f7c2678e7103d7d041dd5dd.setContent(html_dd3c185c6725c2c8093563e2b2af6581);
+            
+        
+
+        rectangle_49edcc89c22e6f74615ff607a0074d6b.bindPopup(popup_5976a4865f7c2678e7103d7d041dd5dd)
+        ;
+
+        
+    
+    
+            var rectangle_445215281ee3f29455abaa2af0e84df5 = L.rectangle(
+                [[-9.25, -61.0], [-9.0, -60.75]],
+                {"bubblingMouseEvents": true, "color": "#D79A32", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#D79A32", "fillOpacity": 0.3, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_d30b2ed0f88255c592faf58f41050725 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_d62130390e357fece23ee8fab7188f9c = $(`<div id="html_d62130390e357fece23ee8fab7188f9c" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-61.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Medium Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 46.2 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 33</p>             </div>             </div>`)[0];
+                popup_d30b2ed0f88255c592faf58f41050725.setContent(html_d62130390e357fece23ee8fab7188f9c);
+            
+        
+
+        rectangle_445215281ee3f29455abaa2af0e84df5.bindPopup(popup_d30b2ed0f88255c592faf58f41050725)
+        ;
+
+        
+    
+    
+            var rectangle_a97ccfc4b0881c12b4d4c164fcc3e5ee = L.rectangle(
+                [[-9.25, -61.5], [-9.0, -61.25]],
+                {"bubblingMouseEvents": true, "color": "#D79A32", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#D79A32", "fillOpacity": 0.3, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_008115c7062000d811b4a3296c348b3b = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_6b7517e9952c6f7a47278db6ae0843f7 = $(`<div id="html_6b7517e9952c6f7a47278db6ae0843f7" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-61.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Medium Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 42.9 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 28</p>             </div>             </div>`)[0];
+                popup_008115c7062000d811b4a3296c348b3b.setContent(html_6b7517e9952c6f7a47278db6ae0843f7);
+            
+        
+
+        rectangle_a97ccfc4b0881c12b4d4c164fcc3e5ee.bindPopup(popup_008115c7062000d811b4a3296c348b3b)
+        ;
+
+        
+    
+    
+            var rectangle_11d569a39ac6f7168020db506562e014 = L.rectangle(
+                [[-7.75, -61.25], [-7.5, -61.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_7cc6fdcd82151347af201397cc4a3f13 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_cd47a0acb0cedcf89766b37f5c064a23 = $(`<div id="html_cd47a0acb0cedcf89766b37f5c064a23" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.75_-61.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 26.4 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 23</p>             </div>             </div>`)[0];
+                popup_7cc6fdcd82151347af201397cc4a3f13.setContent(html_cd47a0acb0cedcf89766b37f5c064a23);
+            
+        
+
+        rectangle_11d569a39ac6f7168020db506562e014.bindPopup(popup_7cc6fdcd82151347af201397cc4a3f13)
+        ;
+
+        
+    
+    
+            var rectangle_572503914f7fda9bcf14c10fa89404a8 = L.rectangle(
+                [[-9.75, -58.25], [-9.5, -58.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_12bad9ebea39df8fe0220a4d599fd1e1 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_99e41f8d2334f2522535048c7370c186 = $(`<div id="html_99e41f8d2334f2522535048c7370c186" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.75_-58.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 25.8 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 11</p>             </div>             </div>`)[0];
+                popup_12bad9ebea39df8fe0220a4d599fd1e1.setContent(html_99e41f8d2334f2522535048c7370c186);
+            
+        
+
+        rectangle_572503914f7fda9bcf14c10fa89404a8.bindPopup(popup_12bad9ebea39df8fe0220a4d599fd1e1)
+        ;
+
+        
+    
+    
+            var rectangle_0c35efa70423d78ec320908b06264691 = L.rectangle(
+                [[-9.5, -60.75], [-9.25, -60.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_60c4db0227e10f9e88a69441a533484f = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_3e485e638dbee1c24141a0ef92831118 = $(`<div id="html_3e485e638dbee1c24141a0ef92831118" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.50_-60.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 25.1 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 3</p>             </div>             </div>`)[0];
+                popup_60c4db0227e10f9e88a69441a533484f.setContent(html_3e485e638dbee1c24141a0ef92831118);
+            
+        
+
+        rectangle_0c35efa70423d78ec320908b06264691.bindPopup(popup_60c4db0227e10f9e88a69441a533484f)
+        ;
+
+        
+    
+    
+            var rectangle_f67ceaf38231ea78345527dca7976a54 = L.rectangle(
+                [[-7.5, -60.75], [-7.25, -60.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_f177a41088a23057d16749c67daf2536 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_4e3fea59f4342cb9ca78bfffa958eeca = $(`<div id="html_4e3fea59f4342cb9ca78bfffa958eeca" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.50_-60.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 23.5 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 15</p>             </div>             </div>`)[0];
+                popup_f177a41088a23057d16749c67daf2536.setContent(html_4e3fea59f4342cb9ca78bfffa958eeca);
+            
+        
+
+        rectangle_f67ceaf38231ea78345527dca7976a54.bindPopup(popup_f177a41088a23057d16749c67daf2536)
+        ;
+
+        
+    
+    
+            var rectangle_b9348445656a78e9c1b2773b07e30dd4 = L.rectangle(
+                [[-9.25, -60.75], [-9.0, -60.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_0ca5df732f1b4a51036993754be735ee = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_04ea79742e79a375c912d24cf78ad2e9 = $(`<div id="html_04ea79742e79a375c912d24cf78ad2e9" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-60.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 22.2 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 9</p>             </div>             </div>`)[0];
+                popup_0ca5df732f1b4a51036993754be735ee.setContent(html_04ea79742e79a375c912d24cf78ad2e9);
+            
+        
+
+        rectangle_b9348445656a78e9c1b2773b07e30dd4.bindPopup(popup_0ca5df732f1b4a51036993754be735ee)
+        ;
+
+        
+    
+    
+            var rectangle_c3fa1dcfc8e8ec49110b9ca8a579c38d = L.rectangle(
+                [[-9.0, -61.5], [-8.75, -61.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_d222211b48d6fd891bb1e6839bbe9e9e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_c7bdf986a63acad296d9d0624888dbb3 = $(`<div id="html_c7bdf986a63acad296d9d0624888dbb3" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.00_-61.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 21.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 16</p>             </div>             </div>`)[0];
+                popup_d222211b48d6fd891bb1e6839bbe9e9e.setContent(html_c7bdf986a63acad296d9d0624888dbb3);
+            
+        
+
+        rectangle_c3fa1dcfc8e8ec49110b9ca8a579c38d.bindPopup(popup_d222211b48d6fd891bb1e6839bbe9e9e)
+        ;
+
+        
+    
+    
+            var rectangle_6c3202cd1f6cdc4d2c2d6257c06c551e = L.rectangle(
+                [[-7.0, -60.0], [-6.75, -59.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_150315ac30236e587161983fb09a6612 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_4ac9a2010170d63d282b724e640d2bef = $(`<div id="html_4ac9a2010170d63d282b724e640d2bef" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.00_-60.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 19.7 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 21</p>             </div>             </div>`)[0];
+                popup_150315ac30236e587161983fb09a6612.setContent(html_4ac9a2010170d63d282b724e640d2bef);
+            
+        
+
+        rectangle_6c3202cd1f6cdc4d2c2d6257c06c551e.bindPopup(popup_150315ac30236e587161983fb09a6612)
+        ;
+
+        
+    
+    
+            var rectangle_0bae8833fbaf5838172708b465d8c695 = L.rectangle(
+                [[-6.75, -60.0], [-6.5, -59.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_03af93b37543f0d04d4309204009af56 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_716056b8b8ccfdf53dbfa477dfe41415 = $(`<div id="html_716056b8b8ccfdf53dbfa477dfe41415" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.75_-60.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 19.6 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 18</p>             </div>             </div>`)[0];
+                popup_03af93b37543f0d04d4309204009af56.setContent(html_716056b8b8ccfdf53dbfa477dfe41415);
+            
+        
+
+        rectangle_0bae8833fbaf5838172708b465d8c695.bindPopup(popup_03af93b37543f0d04d4309204009af56)
+        ;
+
+        
+    
+    
+            var rectangle_f298ee43f88ddd7ecb52824d4b192f37 = L.rectangle(
+                [[-9.25, -61.25], [-9.0, -61.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_592f10b75df755198d3c36076a49e0c2 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_069b7c372ea2558492967d4986b65eef = $(`<div id="html_069b7c372ea2558492967d4986b65eef" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-61.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 18.6 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 10</p>             </div>             </div>`)[0];
+                popup_592f10b75df755198d3c36076a49e0c2.setContent(html_069b7c372ea2558492967d4986b65eef);
+            
+        
+
+        rectangle_f298ee43f88ddd7ecb52824d4b192f37.bindPopup(popup_592f10b75df755198d3c36076a49e0c2)
+        ;
+
+        
+    
+    
+            var rectangle_cc8a35c9ae69be694a5037c9328619f7 = L.rectangle(
+                [[-6.5, -58.25], [-6.25, -58.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_13a2eed53c02218a2a11d48ccdadd7f7 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_161a60dc0553c3c6de85ae1c31b57a98 = $(`<div id="html_161a60dc0553c3c6de85ae1c31b57a98" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.50_-58.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 14.8 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_13a2eed53c02218a2a11d48ccdadd7f7.setContent(html_161a60dc0553c3c6de85ae1c31b57a98);
+            
+        
+
+        rectangle_cc8a35c9ae69be694a5037c9328619f7.bindPopup(popup_13a2eed53c02218a2a11d48ccdadd7f7)
+        ;
+
+        
+    
+    
+            var rectangle_f6a94cfff305c2c007a38c646eee2bb5 = L.rectangle(
+                [[-8.25, -61.5], [-8.0, -61.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_d2f6edf4c913b8ad6a4a258e96e9f873 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_7a332fb2a9dd1d2b3ca0d7bebf860e6b = $(`<div id="html_7a332fb2a9dd1d2b3ca0d7bebf860e6b" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-8.25_-61.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 12.0 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 7</p>             </div>             </div>`)[0];
+                popup_d2f6edf4c913b8ad6a4a258e96e9f873.setContent(html_7a332fb2a9dd1d2b3ca0d7bebf860e6b);
+            
+        
+
+        rectangle_f6a94cfff305c2c007a38c646eee2bb5.bindPopup(popup_d2f6edf4c913b8ad6a4a258e96e9f873)
+        ;
+
+        
+    
+    
+            var rectangle_c1dea26f8e5586cf88ab4923309314cb = L.rectangle(
+                [[-9.25, -60.5], [-9.0, -60.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_d65d50f51529514cf0aa153dce70d436 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_153c5bf6086482b108fdff630b9ff250 = $(`<div id="html_153c5bf6086482b108fdff630b9ff250" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-60.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 11.5 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 3</p>             </div>             </div>`)[0];
+                popup_d65d50f51529514cf0aa153dce70d436.setContent(html_153c5bf6086482b108fdff630b9ff250);
+            
+        
+
+        rectangle_c1dea26f8e5586cf88ab4923309314cb.bindPopup(popup_d65d50f51529514cf0aa153dce70d436)
+        ;
+
+        
+    
+    
+            var rectangle_c8db3ae043e46df7296e86ba1e0229da = L.rectangle(
+                [[-9.5, -60.5], [-9.25, -60.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_ee4b3d5c1ece39511df8eb75d0cecd03 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_3622d9fa31ce8b884ef147dfe7453581 = $(`<div id="html_3622d9fa31ce8b884ef147dfe7453581" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.50_-60.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 9.8 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 5</p>             </div>             </div>`)[0];
+                popup_ee4b3d5c1ece39511df8eb75d0cecd03.setContent(html_3622d9fa31ce8b884ef147dfe7453581);
+            
+        
+
+        rectangle_c8db3ae043e46df7296e86ba1e0229da.bindPopup(popup_ee4b3d5c1ece39511df8eb75d0cecd03)
+        ;
+
+        
+    
+    
+            var rectangle_5d76de15d599832238c131f6174f9f37 = L.rectangle(
+                [[-9.25, -59.0], [-9.0, -58.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_b4796a3bc868918d8941482016c2a1f7 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_0856feade2b183523364f5afd4286e08 = $(`<div id="html_0856feade2b183523364f5afd4286e08" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-59.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 8.0 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 5</p>             </div>             </div>`)[0];
+                popup_b4796a3bc868918d8941482016c2a1f7.setContent(html_0856feade2b183523364f5afd4286e08);
+            
+        
+
+        rectangle_5d76de15d599832238c131f6174f9f37.bindPopup(popup_b4796a3bc868918d8941482016c2a1f7)
+        ;
+
+        
+    
+    
+            var rectangle_2ff6de3bbda4883ac830744f36d05eff = L.rectangle(
+                [[-6.5, -58.75], [-6.25, -58.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_f332cdbfc1b6f78d32ae3f5152b31579 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_797e9f9cd0b5f8ddc4fb3e9808c406d1 = $(`<div id="html_797e9f9cd0b5f8ddc4fb3e9808c406d1" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.50_-58.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 7.4 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 4</p>             </div>             </div>`)[0];
+                popup_f332cdbfc1b6f78d32ae3f5152b31579.setContent(html_797e9f9cd0b5f8ddc4fb3e9808c406d1);
+            
+        
+
+        rectangle_2ff6de3bbda4883ac830744f36d05eff.bindPopup(popup_f332cdbfc1b6f78d32ae3f5152b31579)
+        ;
+
+        
+    
+    
+            var rectangle_62eae41490942fff859918e7a1f067e1 = L.rectangle(
+                [[-7.25, -59.25], [-7.0, -59.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_d3bdf5f86364f45ee72fc1283b75a8f1 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_9bd7793ce56cc58877ce166000880de9 = $(`<div id="html_9bd7793ce56cc58877ce166000880de9" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.25_-59.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 7.2 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 4</p>             </div>             </div>`)[0];
+                popup_d3bdf5f86364f45ee72fc1283b75a8f1.setContent(html_9bd7793ce56cc58877ce166000880de9);
+            
+        
+
+        rectangle_62eae41490942fff859918e7a1f067e1.bindPopup(popup_d3bdf5f86364f45ee72fc1283b75a8f1)
+        ;
+
+        
+    
+    
+            var rectangle_42780af4b3b23c1ea47617c2a3d612d5 = L.rectangle(
+                [[-8.0, -61.75], [-7.75, -61.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_f18f9aaf546d54b4acb9fe6cb96c8df3 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_4bfed09cdf8b37f07d91b67f4736494a = $(`<div id="html_4bfed09cdf8b37f07d91b67f4736494a" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-8.00_-61.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 6.0 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 3</p>             </div>             </div>`)[0];
+                popup_f18f9aaf546d54b4acb9fe6cb96c8df3.setContent(html_4bfed09cdf8b37f07d91b67f4736494a);
+            
+        
+
+        rectangle_42780af4b3b23c1ea47617c2a3d612d5.bindPopup(popup_f18f9aaf546d54b4acb9fe6cb96c8df3)
+        ;
+
+        
+    
+    
+            var rectangle_f3f00facfd1c4d015d70f4182b2c1fc5 = L.rectangle(
+                [[-7.5, -61.75], [-7.25, -61.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_110c3e57c819b5361d404d8acd55ff27 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_92cfdad2e25c4b7fe19f47c6b8781eee = $(`<div id="html_92cfdad2e25c4b7fe19f47c6b8781eee" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.50_-61.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 5.1 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 3</p>             </div>             </div>`)[0];
+                popup_110c3e57c819b5361d404d8acd55ff27.setContent(html_92cfdad2e25c4b7fe19f47c6b8781eee);
+            
+        
+
+        rectangle_f3f00facfd1c4d015d70f4182b2c1fc5.bindPopup(popup_110c3e57c819b5361d404d8acd55ff27)
+        ;
+
+        
+    
+    
+            var rectangle_c138f9d3f2f311f66f1f4be52c9f0d40 = L.rectangle(
+                [[-10.0, -60.25], [-9.75, -60.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_c7cb8dac0e649ee7d2d5d8672c873c1b = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_effd68c8f8eb4e09cc2409a9f80f19c5 = $(`<div id="html_effd68c8f8eb4e09cc2409a9f80f19c5" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-10.00_-60.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 4.4 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_c7cb8dac0e649ee7d2d5d8672c873c1b.setContent(html_effd68c8f8eb4e09cc2409a9f80f19c5);
+            
+        
+
+        rectangle_c138f9d3f2f311f66f1f4be52c9f0d40.bindPopup(popup_c7cb8dac0e649ee7d2d5d8672c873c1b)
+        ;
+
+        
+    
+    
+            var rectangle_ad0908e1c19a6f86639a108d2b21dbc1 = L.rectangle(
+                [[-8.0, -61.5], [-7.75, -61.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_8c11ef930d212e789a8f956d8f328c4e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_35e088801abbe0d5d3096e192c8ba1c5 = $(`<div id="html_35e088801abbe0d5d3096e192c8ba1c5" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-8.00_-61.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 4.4 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 4</p>             </div>             </div>`)[0];
+                popup_8c11ef930d212e789a8f956d8f328c4e.setContent(html_35e088801abbe0d5d3096e192c8ba1c5);
+            
+        
+
+        rectangle_ad0908e1c19a6f86639a108d2b21dbc1.bindPopup(popup_8c11ef930d212e789a8f956d8f328c4e)
+        ;
+
+        
+    
+    
+            var rectangle_a9efbd24be33d827b5211fe6f6d45a01 = L.rectangle(
+                [[-7.0, -59.5], [-6.75, -59.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_0084c98a8dc8bee51c7b4f7945062768 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_b883eeb93c0d7476dc720b50fefaa8bb = $(`<div id="html_b883eeb93c0d7476dc720b50fefaa8bb" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.00_-59.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 4.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 4</p>             </div>             </div>`)[0];
+                popup_0084c98a8dc8bee51c7b4f7945062768.setContent(html_b883eeb93c0d7476dc720b50fefaa8bb);
+            
+        
+
+        rectangle_a9efbd24be33d827b5211fe6f6d45a01.bindPopup(popup_0084c98a8dc8bee51c7b4f7945062768)
+        ;
+
+        
+    
+    
+            var rectangle_259d70b0a46634b7a52d06ea82f2406f = L.rectangle(
+                [[-6.5, -60.25], [-6.25, -60.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_f6e4c9f44c9ef8f447020fdbbb842f65 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_ddab96759bc1a7b28d2ce371af28d4ff = $(`<div id="html_ddab96759bc1a7b28d2ce371af28d4ff" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.50_-60.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 3.7 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_f6e4c9f44c9ef8f447020fdbbb842f65.setContent(html_ddab96759bc1a7b28d2ce371af28d4ff);
+            
+        
+
+        rectangle_259d70b0a46634b7a52d06ea82f2406f.bindPopup(popup_f6e4c9f44c9ef8f447020fdbbb842f65)
+        ;
+
+        
+    
+    
+            var rectangle_e24c4cdf21d0fe493be718bb2003c124 = L.rectangle(
+                [[-7.0, -59.75], [-6.75, -59.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_734fe540b5eec3fe952bfe2def7ae162 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_a3f9acbb6944c87ea9ea9b2bcdccb114 = $(`<div id="html_a3f9acbb6944c87ea9ea9b2bcdccb114" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.00_-59.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 3.4 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_734fe540b5eec3fe952bfe2def7ae162.setContent(html_a3f9acbb6944c87ea9ea9b2bcdccb114);
+            
+        
+
+        rectangle_e24c4cdf21d0fe493be718bb2003c124.bindPopup(popup_734fe540b5eec3fe952bfe2def7ae162)
+        ;
+
+        
+    
+    
+            var rectangle_d859bc71412bee2c574b4597ec51b0a1 = L.rectangle(
+                [[-9.75, -62.0], [-9.5, -61.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_e182d22a86e64f12780651e7b988534a = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_109f42a060889c0e3f61cf6d5b44e5c3 = $(`<div id="html_109f42a060889c0e3f61cf6d5b44e5c3" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.75_-62.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 3.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_e182d22a86e64f12780651e7b988534a.setContent(html_109f42a060889c0e3f61cf6d5b44e5c3);
+            
+        
+
+        rectangle_d859bc71412bee2c574b4597ec51b0a1.bindPopup(popup_e182d22a86e64f12780651e7b988534a)
+        ;
+
+        
+    
+    
+            var rectangle_7c3a85627a585c62a9e2654657e72a50 = L.rectangle(
+                [[-6.5, -62.0], [-6.25, -61.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_acba9e1ec3fe008645315da2117418d4 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_03845e26703412d06af156df602d4975 = $(`<div id="html_03845e26703412d06af156df602d4975" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.50_-62.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 2.8 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_acba9e1ec3fe008645315da2117418d4.setContent(html_03845e26703412d06af156df602d4975);
+            
+        
+
+        rectangle_7c3a85627a585c62a9e2654657e72a50.bindPopup(popup_acba9e1ec3fe008645315da2117418d4)
+        ;
+
+        
+    
+    
+            var rectangle_cb08c6eff1aa56890409948137261a6c = L.rectangle(
+                [[-9.25, -59.25], [-9.0, -59.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_c60bf9e91eea1af5682c11b20e586f59 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_74bfb33689247fd897bb9fa5e0c9f7a4 = $(`<div id="html_74bfb33689247fd897bb9fa5e0c9f7a4" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.25_-59.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 2.5 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_c60bf9e91eea1af5682c11b20e586f59.setContent(html_74bfb33689247fd897bb9fa5e0c9f7a4);
+            
+        
+
+        rectangle_cb08c6eff1aa56890409948137261a6c.bindPopup(popup_c60bf9e91eea1af5682c11b20e586f59)
+        ;
+
+        
+    
+    
+            var rectangle_2e83590c645f3623d9606f0f1f621818 = L.rectangle(
+                [[-7.5, -60.0], [-7.25, -59.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_246873d90ea339ad76e410e3a5655175 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_e11831c091ad1d57d99276a6594175a3 = $(`<div id="html_e11831c091ad1d57d99276a6594175a3" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.50_-60.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 2.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_246873d90ea339ad76e410e3a5655175.setContent(html_e11831c091ad1d57d99276a6594175a3);
+            
+        
+
+        rectangle_2e83590c645f3623d9606f0f1f621818.bindPopup(popup_246873d90ea339ad76e410e3a5655175)
+        ;
+
+        
+    
+    
+            var rectangle_bcb53f499082403a7784a3139ced388b = L.rectangle(
+                [[-6.75, -58.75], [-6.5, -58.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_1d9a50a51966fef28d25e3466498cd12 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_788b9ec785beb14ae2a68123d744eb26 = $(`<div id="html_788b9ec785beb14ae2a68123d744eb26" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.75_-58.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 2.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_1d9a50a51966fef28d25e3466498cd12.setContent(html_788b9ec785beb14ae2a68123d744eb26);
+            
+        
+
+        rectangle_bcb53f499082403a7784a3139ced388b.bindPopup(popup_1d9a50a51966fef28d25e3466498cd12)
+        ;
+
+        
+    
+    
+            var rectangle_9d4c9d765774a0cc9a69db3f75997d26 = L.rectangle(
+                [[-10.0, -60.5], [-9.75, -60.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_b396e9f06cd4d76ddd2d55614849804a = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_bf2ee8b360403f90dc075408f457b0e1 = $(`<div id="html_bf2ee8b360403f90dc075408f457b0e1" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-10.00_-60.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 2.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_b396e9f06cd4d76ddd2d55614849804a.setContent(html_bf2ee8b360403f90dc075408f457b0e1);
+            
+        
+
+        rectangle_9d4c9d765774a0cc9a69db3f75997d26.bindPopup(popup_b396e9f06cd4d76ddd2d55614849804a)
+        ;
+
+        
+    
+    
+            var rectangle_089eabd05b5d438808ac60d3c5acc1a4 = L.rectangle(
+                [[-6.75, -60.25], [-6.5, -60.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_42b31f2ef81d7fec22661c872e79d10c = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_d19612dd769782ef3d7742553276c238 = $(`<div id="html_d19612dd769782ef3d7742553276c238" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.75_-60.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 2.3 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_42b31f2ef81d7fec22661c872e79d10c.setContent(html_d19612dd769782ef3d7742553276c238);
+            
+        
+
+        rectangle_089eabd05b5d438808ac60d3c5acc1a4.bindPopup(popup_42b31f2ef81d7fec22661c872e79d10c)
+        ;
+
+        
+    
+    
+            var rectangle_83ebf737e968bb8e663af27b44e1d062 = L.rectangle(
+                [[-7.25, -60.25], [-7.0, -60.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_5edc12ab417111fba1276715c05338bf = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_4c2e81549f6ecf618c856bed14a75433 = $(`<div id="html_4c2e81549f6ecf618c856bed14a75433" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.25_-60.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 1.9 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_5edc12ab417111fba1276715c05338bf.setContent(html_4c2e81549f6ecf618c856bed14a75433);
+            
+        
+
+        rectangle_83ebf737e968bb8e663af27b44e1d062.bindPopup(popup_5edc12ab417111fba1276715c05338bf)
+        ;
+
+        
+    
+    
+            var rectangle_92bf23f5e98182077426b48062d3525a = L.rectangle(
+                [[-6.25, -60.0], [-6.0, -59.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_10145e58640cb196b1d8de70d27f3f85 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_14e42736894f112a603257001c5c1788 = $(`<div id="html_14e42736894f112a603257001c5c1788" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.25_-60.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 1.9 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_10145e58640cb196b1d8de70d27f3f85.setContent(html_14e42736894f112a603257001c5c1788);
+            
+        
+
+        rectangle_92bf23f5e98182077426b48062d3525a.bindPopup(popup_10145e58640cb196b1d8de70d27f3f85)
+        ;
+
+        
+    
+    
+            var rectangle_74eac5c27e7840859dc5018c047a28fd = L.rectangle(
+                [[-7.0, -59.0], [-6.75, -58.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_7c90d210075379097ec57ab7c629b35c = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_e2e569282aed6c0d76ce3893e28b04d1 = $(`<div id="html_e2e569282aed6c0d76ce3893e28b04d1" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.00_-59.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 1.5 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 2</p>             </div>             </div>`)[0];
+                popup_7c90d210075379097ec57ab7c629b35c.setContent(html_e2e569282aed6c0d76ce3893e28b04d1);
+            
+        
+
+        rectangle_74eac5c27e7840859dc5018c047a28fd.bindPopup(popup_7c90d210075379097ec57ab7c629b35c)
+        ;
+
+        
+    
+    
+            var rectangle_f46d931f4f91449509502c0739149a2e = L.rectangle(
+                [[-7.25, -59.5], [-7.0, -59.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_d2a5b7765955b1987c2017c806a6742e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_5bc77a78e9520f307fbd7920b5da720f = $(`<div id="html_5bc77a78e9520f307fbd7920b5da720f" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.25_-59.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 1.5 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_d2a5b7765955b1987c2017c806a6742e.setContent(html_5bc77a78e9520f307fbd7920b5da720f);
+            
+        
+
+        rectangle_f46d931f4f91449509502c0739149a2e.bindPopup(popup_d2a5b7765955b1987c2017c806a6742e)
+        ;
+
+        
+    
+    
+            var rectangle_cf2dea6e97ce20adc3822b7ca3bafa1a = L.rectangle(
+                [[-7.75, -61.5], [-7.5, -61.25]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_4d7ea26d21764a0ca12bd7bd86b28199 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_3341846d5673d959b1dc5b5ba2605426 = $(`<div id="html_3341846d5673d959b1dc5b5ba2605426" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.75_-61.50</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 1.5 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_4d7ea26d21764a0ca12bd7bd86b28199.setContent(html_3341846d5673d959b1dc5b5ba2605426);
+            
+        
+
+        rectangle_cf2dea6e97ce20adc3822b7ca3bafa1a.bindPopup(popup_4d7ea26d21764a0ca12bd7bd86b28199)
+        ;
+
+        
+    
+    
+            var rectangle_06ac19be4bdfdebaa3ee5af2f9a9360f = L.rectangle(
+                [[-6.25, -61.75], [-6.0, -61.5]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_ac40c914822b7e2938c78dafc5ab144b = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_447e81ae00731cf98c441e19390a1eaa = $(`<div id="html_447e81ae00731cf98c441e19390a1eaa" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.25_-61.75</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 1.4 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_ac40c914822b7e2938c78dafc5ab144b.setContent(html_447e81ae00731cf98c441e19390a1eaa);
+            
+        
+
+        rectangle_06ac19be4bdfdebaa3ee5af2f9a9360f.bindPopup(popup_ac40c914822b7e2938c78dafc5ab144b)
+        ;
+
+        
+    
+    
+            var rectangle_a121d111d030afc04f514c230f7fa313 = L.rectangle(
+                [[-7.0, -59.25], [-6.75, -59.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_136bfc1d238e50c453cdd8761f631bf8 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_d22814462da7a65f1ca0764e7e38c449 = $(`<div id="html_d22814462da7a65f1ca0764e7e38c449" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-7.00_-59.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 0.9 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_136bfc1d238e50c453cdd8761f631bf8.setContent(html_d22814462da7a65f1ca0764e7e38c449);
+            
+        
+
+        rectangle_a121d111d030afc04f514c230f7fa313.bindPopup(popup_136bfc1d238e50c453cdd8761f631bf8)
+        ;
+
+        
+    
+    
+            var rectangle_fbc68211784920865ab5f54f8a62972e = L.rectangle(
+                [[-6.5, -60.0], [-6.25, -59.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_36638d623daae88ab59d87bc25807be4 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_0c5509d9a88d19b975c61050d97254da = $(`<div id="html_0c5509d9a88d19b975c61050d97254da" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-6.50_-60.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 0.8 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_36638d623daae88ab59d87bc25807be4.setContent(html_0c5509d9a88d19b975c61050d97254da);
+            
+        
+
+        rectangle_fbc68211784920865ab5f54f8a62972e.bindPopup(popup_36638d623daae88ab59d87bc25807be4)
+        ;
+
+        
+    
+    
+            var rectangle_9fd3f5772ecf42a06b188fc9052f20ef = L.rectangle(
+                [[-9.5, -59.25], [-9.25, -59.0]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_e7d06593519c308267c8799ba211f7da = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_1ed4d96fe1f7ddcc2db94d5bcb99d5c4 = $(`<div id="html_1ed4d96fe1f7ddcc2db94d5bcb99d5c4" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-9.50_-59.25</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 0.8 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_e7d06593519c308267c8799ba211f7da.setContent(html_1ed4d96fe1f7ddcc2db94d5bcb99d5c4);
+            
+        
+
+        rectangle_9fd3f5772ecf42a06b188fc9052f20ef.bindPopup(popup_e7d06593519c308267c8799ba211f7da)
+        ;
+
+        
+    
+    
+            var rectangle_2bdf25668bcdba8354423712a6e7893d = L.rectangle(
+                [[-10.0, -59.0], [-9.75, -58.75]],
+                {"bubblingMouseEvents": true, "color": "#5C8A69", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#5C8A69", "fillOpacity": 0.15, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(feature_group_bbe496f37d5f0ccbe790693f57b29306);
+        
+    
+        var popup_a7d0bb81996ce08082fe46de1a554732 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_9ba20a6dd787733e37d966b564efa1d5 = $(`<div id="html_9ba20a6dd787733e37d966b564efa1d5" style="width: 100.0%; height: 100.0%;">             <div style="font-family: sans-serif; font-size: 12px; width: 220px;">                 <h4 style="margin: 0 0 6px 0; color: #1E2A22;">grid_-10.00_-59.00</h4>                 <p style="margin: 2px 0;"><b>Fire Priority:</b> Low Priority</p>                 <p style="margin: 2px 0;"><b>Fire Score:</b> 0.6 / 100</p>                 <p style="margin: 2px 0;"><b>Active Detections:</b> 1</p>             </div>             </div>`)[0];
+                popup_a7d0bb81996ce08082fe46de1a554732.setContent(html_9ba20a6dd787733e37d966b564efa1d5);
+            
+        
+
+        rectangle_2bdf25668bcdba8354423712a6e7893d.bindPopup(popup_a7d0bb81996ce08082fe46de1a554732)
+        ;
+
+        
+    
+    
+            feature_group_bbe496f37d5f0ccbe790693f57b29306.addTo(map_a2e04203f06de1a36c01fa1198d86c18);
+        
+    
+            var feature_group_6bc68524d86ff450476cc5c9a8bda73f = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var rectangle_bdba23f8c3b0d17ece780b00a41a34e9 = L.rectangle(
+                [[-8.0, -61.25], [-7.75, -61.0]],
+                {"bubblingMouseEvents": true, "color": "#5C7F63", "dashArray": "5, 5", "dashOffset": null, "fill": true, "fillColor": "#2A9D8F", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_6bc68524d86ff450476cc5c9a8bda73f);
+        
+    
+        var popup_d51611fefb79861f65a61fbe6f315468 = L.popup({
+  "maxWidth": 290,
+});
+
+        
+            
+                var html_e85bd0cc7648c34edfeadca22f1d2e67 = $(`<div id="html_e85bd0cc7648c34edfeadca22f1d2e67" style="width: 100.0%; height: 100.0%;">                 <div style="font-family: sans-serif; font-size: 12px; width: 260px; line-height: 1.4;">                     <h4 style="margin: 0 0 6px 0; color: #274E3C; border-bottom: 1px solid #CCC; padding-bottom: 4px;">                         🌿 grid_-8.00_-61.25 - Conservation Analysis                     </h4>                     <p style="margin: 3px 0;"><b>Fire Activity Priority:</b> High Priority (72.2)</p>                     <p style="margin: 3px 0;"><b>Unique Animal Species Recorded:</b> 13</p>                     <p style="margin: 3px 0;"><b>Verified Threatened Species:</b> <span style="color: #5C7F63; font-weight: bold;">0</span></p>                     <p style="margin: 3px 0;"><b>Highest Verified IUCN Status:</b> None verified / unavailable</p>                     <p style="margin: 3px 0;"><b>Conservation Exposure Score:</b> Pending Verification</p>                     <p style="margin: 3px 0;"><b>Exposure Label:</b> Status Unavailable or Not Threatened</p>                     <div style="margin-top: 8px; font-size: 10px; color: #78877E; border-top: 1px dashed #DDD; padding-top: 4px;">                         <b>Responsible Use Note:</b> Species data is aggregated to this 0.25° grid cell to protect wildlife. Reflects documented historical occurrences, not confirmed current presence.                     </div>                 </div>                 </div>`)[0];
+                popup_d51611fefb79861f65a61fbe6f315468.setContent(html_e85bd0cc7648c34edfeadca22f1d2e67);
+            
+        
+
+        rectangle_bdba23f8c3b0d17ece780b00a41a34e9.bindPopup(popup_d51611fefb79861f65a61fbe6f315468)
+        ;
+
+        
+    
+    
+            rectangle_bdba23f8c3b0d17ece780b00a41a34e9.bindTooltip(
+                `<div>
+                     grid_-8.00_-61.25: 0 threatened species recorded (Fire Score: 72.2)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var rectangle_fd65186319979ff6255a527b52bbb46b = L.rectangle(
+                [[-10.0, -60.75], [-9.75, -60.5]],
+                {"bubblingMouseEvents": true, "color": "#5C7F63", "dashArray": "5, 5", "dashOffset": null, "fill": true, "fillColor": "#2A9D8F", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_6bc68524d86ff450476cc5c9a8bda73f);
+        
+    
+        var popup_4b92693d3b98c06026cd69a69c9e2a24 = L.popup({
+  "maxWidth": 290,
+});
+
+        
+            
+                var html_ce0b19a64afac9eb5079c958704223e8 = $(`<div id="html_ce0b19a64afac9eb5079c958704223e8" style="width: 100.0%; height: 100.0%;">                 <div style="font-family: sans-serif; font-size: 12px; width: 260px; line-height: 1.4;">                     <h4 style="margin: 0 0 6px 0; color: #274E3C; border-bottom: 1px solid #CCC; padding-bottom: 4px;">                         🌿 grid_-10.00_-60.75 - Conservation Analysis                     </h4>                     <p style="margin: 3px 0;"><b>Fire Activity Priority:</b> Medium Priority (57.6)</p>                     <p style="margin: 3px 0;"><b>Unique Animal Species Recorded:</b> 1</p>                     <p style="margin: 3px 0;"><b>Verified Threatened Species:</b> <span style="color: #5C7F63; font-weight: bold;">0</span></p>                     <p style="margin: 3px 0;"><b>Highest Verified IUCN Status:</b> None verified / unavailable</p>                     <p style="margin: 3px 0;"><b>Conservation Exposure Score:</b> Pending Verification</p>                     <p style="margin: 3px 0;"><b>Exposure Label:</b> Status Unavailable or Not Threatened</p>                     <div style="margin-top: 8px; font-size: 10px; color: #78877E; border-top: 1px dashed #DDD; padding-top: 4px;">                         <b>Responsible Use Note:</b> Species data is aggregated to this 0.25° grid cell to protect wildlife. Reflects documented historical occurrences, not confirmed current presence.                     </div>                 </div>                 </div>`)[0];
+                popup_4b92693d3b98c06026cd69a69c9e2a24.setContent(html_ce0b19a64afac9eb5079c958704223e8);
+            
+        
+
+        rectangle_fd65186319979ff6255a527b52bbb46b.bindPopup(popup_4b92693d3b98c06026cd69a69c9e2a24)
+        ;
+
+        
+    
+    
+            rectangle_fd65186319979ff6255a527b52bbb46b.bindTooltip(
+                `<div>
+                     grid_-10.00_-60.75: 0 threatened species recorded (Fire Score: 57.6)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var rectangle_7d2740958b7b5ea416e4c414cf800ec6 = L.rectangle(
+                [[-9.25, -61.0], [-9.0, -60.75]],
+                {"bubblingMouseEvents": true, "color": "#5C7F63", "dashArray": "5, 5", "dashOffset": null, "fill": true, "fillColor": "#2A9D8F", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_6bc68524d86ff450476cc5c9a8bda73f);
+        
+    
+        var popup_89c2ea2f7b860f0203d0ee40ac382656 = L.popup({
+  "maxWidth": 290,
+});
+
+        
+            
+                var html_653f5451ea9e24e92b179a8ca08f1451 = $(`<div id="html_653f5451ea9e24e92b179a8ca08f1451" style="width: 100.0%; height: 100.0%;">                 <div style="font-family: sans-serif; font-size: 12px; width: 260px; line-height: 1.4;">                     <h4 style="margin: 0 0 6px 0; color: #274E3C; border-bottom: 1px solid #CCC; padding-bottom: 4px;">                         🌿 grid_-9.25_-61.00 - Conservation Analysis                     </h4>                     <p style="margin: 3px 0;"><b>Fire Activity Priority:</b> Medium Priority (46.2)</p>                     <p style="margin: 3px 0;"><b>Unique Animal Species Recorded:</b> 9</p>                     <p style="margin: 3px 0;"><b>Verified Threatened Species:</b> <span style="color: #5C7F63; font-weight: bold;">0</span></p>                     <p style="margin: 3px 0;"><b>Highest Verified IUCN Status:</b> None verified / unavailable</p>                     <p style="margin: 3px 0;"><b>Conservation Exposure Score:</b> Pending Verification</p>                     <p style="margin: 3px 0;"><b>Exposure Label:</b> Status Unavailable or Not Threatened</p>                     <div style="margin-top: 8px; font-size: 10px; color: #78877E; border-top: 1px dashed #DDD; padding-top: 4px;">                         <b>Responsible Use Note:</b> Species data is aggregated to this 0.25° grid cell to protect wildlife. Reflects documented historical occurrences, not confirmed current presence.                     </div>                 </div>                 </div>`)[0];
+                popup_89c2ea2f7b860f0203d0ee40ac382656.setContent(html_653f5451ea9e24e92b179a8ca08f1451);
+            
+        
+
+        rectangle_7d2740958b7b5ea416e4c414cf800ec6.bindPopup(popup_89c2ea2f7b860f0203d0ee40ac382656)
+        ;
+
+        
+    
+    
+            rectangle_7d2740958b7b5ea416e4c414cf800ec6.bindTooltip(
+                `<div>
+                     grid_-9.25_-61.00: 0 threatened species recorded (Fire Score: 46.2)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var rectangle_4b46f74755709742bfa39f493037c025 = L.rectangle(
+                [[-9.25, -61.5], [-9.0, -61.25]],
+                {"bubblingMouseEvents": true, "color": "#5C7F63", "dashArray": "5, 5", "dashOffset": null, "fill": true, "fillColor": "#2A9D8F", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_6bc68524d86ff450476cc5c9a8bda73f);
+        
+    
+        var popup_ff0c0989ecfa51a98a5fec9e35a1e69d = L.popup({
+  "maxWidth": 290,
+});
+
+        
+            
+                var html_2ce766f225c0f027626bf7ba44e4f696 = $(`<div id="html_2ce766f225c0f027626bf7ba44e4f696" style="width: 100.0%; height: 100.0%;">                 <div style="font-family: sans-serif; font-size: 12px; width: 260px; line-height: 1.4;">                     <h4 style="margin: 0 0 6px 0; color: #274E3C; border-bottom: 1px solid #CCC; padding-bottom: 4px;">                         🌿 grid_-9.25_-61.50 - Conservation Analysis                     </h4>                     <p style="margin: 3px 0;"><b>Fire Activity Priority:</b> Medium Priority (42.9)</p>                     <p style="margin: 3px 0;"><b>Unique Animal Species Recorded:</b> 0</p>                     <p style="margin: 3px 0;"><b>Verified Threatened Species:</b> <span style="color: #5C7F63; font-weight: bold;">0</span></p>                     <p style="margin: 3px 0;"><b>Highest Verified IUCN Status:</b> None verified / unavailable</p>                     <p style="margin: 3px 0;"><b>Conservation Exposure Score:</b> Pending Verification</p>                     <p style="margin: 3px 0;"><b>Exposure Label:</b> Status Unavailable or Not Threatened</p>                     <div style="margin-top: 8px; font-size: 10px; color: #78877E; border-top: 1px dashed #DDD; padding-top: 4px;">                         <b>Responsible Use Note:</b> Species data is aggregated to this 0.25° grid cell to protect wildlife. Reflects documented historical occurrences, not confirmed current presence.                     </div>                 </div>                 </div>`)[0];
+                popup_ff0c0989ecfa51a98a5fec9e35a1e69d.setContent(html_2ce766f225c0f027626bf7ba44e4f696);
+            
+        
+
+        rectangle_4b46f74755709742bfa39f493037c025.bindPopup(popup_ff0c0989ecfa51a98a5fec9e35a1e69d)
+        ;
+
+        
+    
+    
+            rectangle_4b46f74755709742bfa39f493037c025.bindTooltip(
+                `<div>
+                     grid_-9.25_-61.50: 0 threatened species recorded (Fire Score: 42.9)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_6bc68524d86ff450476cc5c9a8bda73f.addTo(map_a2e04203f06de1a36c01fa1198d86c18);
+        
+    
+            var layer_control_b45b0707d271df6a621e42e8a39a404a_layers = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_d92690b08eb79d52da4683a579d1e819,
+                },
+                overlays :  {
+                    "Fire Activity Priority Zones" : feature_group_bbe496f37d5f0ccbe790693f57b29306,
+                    "Conservation Exposure Overlay" : feature_group_6bc68524d86ff450476cc5c9a8bda73f,
+                },
+            };
+            let layer_control_b45b0707d271df6a621e42e8a39a404a = L.control.layers(
+                layer_control_b45b0707d271df6a621e42e8a39a404a_layers.base_layers,
+                layer_control_b45b0707d271df6a621e42e8a39a404a_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_a2e04203f06de1a36c01fa1198d86c18);
+
+        
+</script>
+</html>
