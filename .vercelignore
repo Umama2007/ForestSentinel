@@ -5,7 +5,15 @@ venv
 ENV
 __pycache__
 *.pyc
+.env
+.env.*
+!.env.example
+secrets
+scripts
 tests
 data/raw
 logs
 .pytest_cache
+reports/pdf
+reports/*.pdf
+reports/conservation/*/*.pdf

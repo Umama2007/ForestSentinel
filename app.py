@@ -282,6 +282,16 @@ def run_stage(stage: str):
             "analysis": "Part 2 Geospatial Grid Aggregation & Hotspot Prioritization",
             "conservation": "Part 3 GBIF Biodiversity Enrichment & IUCN Exposure",
         }
+        r = latest_reports()
+        etl = r.get("etl") or {}
+        analysis = r.get("analysis") or {}
+        cons = r.get("conservation") or {}
+        db_proj = etl.get("database_project") or etl.get("firebase_project_id") or "Supabase PostgreSQL"
+        n_records = analysis.get("eda_results", {}).get("overview", {}).get("total_records", 0)
+        grid = analysis.get("grid_metadata", {})
+        n_cells = grid.get("total_populated_cells", 0)
+        n_high = grid.get("high_priority_count", 0)
+        n_species = cons.get("summary_statistics", {}).get("total_unique_animal_species", 0)
         return jsonify({
             "success": True,
             "stage": stage,
@@ -290,11 +300,11 @@ def run_stage(stage: str):
             "output": (
                 f"[PRODUCTION SERVERLESS DISPATCH]\n"
                 f"• Pipeline: {stage_titles[stage]}\n"
-                f"• Host Environment: Vercel Edge Serverless Python Runtime\n"
-                f"• Database: Supabase PostgreSQL (forestsentinel)\n"
+                f"• Host Environment: Vercel Serverless Python Runtime\n"
+                f"• Database: Supabase PostgreSQL ({db_proj})\n"
                 f"• Execution Mode: Production live-served state.\n"
-                f"• Background Worker: In production, ingestion pipelines run on scheduled cron workers / GitHub Actions.\n"
-                f"• Current Verified Telemetry: 357 NASA fire records, 44 grid cells, 4 high-priority hotspots (score 89.0 max).\n"
+                f"• Background Worker: In production, ingestion pipelines run on scheduled cron workers / CLI.\n"
+                f"• Current Verified Telemetry: {n_records} NASA fire records, {n_cells} grid cells, {n_high} high-priority hotspots, {n_species} animal species.\n"
                 f"• All geospatial Folium layers, analytical figures, and PDF generators are active."
             ),
             "map_updated": False,

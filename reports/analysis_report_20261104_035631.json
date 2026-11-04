@@ -1,0 +1,853 @@
+{
+  "title": "ForestSentinel Fire Activity EDA & Priority-Zone Analysis Report",
+  "generated_at": "2026-11-04T03:56:31.554361+00:00",
+  "scope": "Part 2: Fire Activity Exploratory Data Analysis & Explainable Priority-Zone Classification",
+  "data_source": {
+    "platform": "Supabase (Postgres)",
+    "collection": "fire_detections",
+    "project_id": "advspndbkxswkloufnbu"
+  },
+  "eda_results": {
+    "overview": {
+      "total_records": 171,
+      "earliest_detection_datetime": "2026-10-31T16:52:00+00:00",
+      "latest_detection_datetime": "2026-11-03T17:36:00+00:00",
+      "unique_detection_dates_count": 4,
+      "unique_detection_dates": [
+        "2026-10-31",
+        "2026-11-01",
+        "2026-11-02",
+        "2026-11-03"
+      ],
+      "unique_satellites_count": 1,
+      "satellites": [
+        "N21"
+      ],
+      "unique_instruments_count": 1,
+      "instruments": [
+        "VIIRS"
+      ],
+      "day_detections": 145,
+      "night_detections": 26,
+      "records_with_frp_count": 171,
+      "records_with_frp_percentage": 100.0,
+      "confidence_counts": {
+        "n": 159,
+        "l": 9,
+        "h": 3
+      }
+    },
+    "temporal": {
+      "daily_detections": {
+        "2026-10-31": 1,
+        "2026-11-01": 18,
+        "2026-11-02": 99,
+        "2026-11-03": 53
+      },
+      "hourly_detections": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 14,
+        "5": 12,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 3,
+        "17": 130,
+        "18": 12,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      },
+      "day_night_distribution": {
+        "D": 145,
+        "N": 26
+      },
+      "hourly_by_daynight": {
+        "D": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 3,
+          "17": 130,
+          "18": 12,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0
+        },
+        "N": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "4": 14,
+          "5": 12,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+          "13": 0,
+          "14": 0,
+          "15": 0,
+          "16": 0,
+          "17": 0,
+          "18": 0,
+          "19": 0,
+          "20": 0,
+          "21": 0,
+          "22": 0,
+          "23": 0
+        }
+      },
+      "trend_summary": "increasing",
+      "trend_explanation": "Average daily detections rose from 9.5 in the early window to 76.0 in the latter window (+700.0%)."
+    },
+    "intensity": {
+      "frp_available": true,
+      "count": 171,
+      "min_frp": 0.51,
+      "max_frp": 59.5,
+      "mean_frp": 11.06,
+      "median_frp": 7.41,
+      "q25_frp": 3.92,
+      "q75_frp": 11.79,
+      "std_frp": 12.19,
+      "top_10_detections": [
+        {
+          "detection_key": "8548dcf2979eb32884b893807b386342f798d5d3980f894221cee628ac67dab6",
+          "latitude": -9.2332,
+          "longitude": -58.9932,
+          "acq_datetime": "2026-11-02T17:53:00+00:00",
+          "frp": 59.5,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "61cc19597eb9e4b967a43ef2d90ca283a46f1a249c30d9a750285fc3a05be3b6",
+          "latitude": -6.8342,
+          "longitude": -59.2675,
+          "acq_datetime": "2026-11-02T17:53:00+00:00",
+          "frp": 58.73,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "ab8e20c92a58e885e87f2831672427bee098a03038c33a43a2ea4e31748a75d1",
+          "latitude": -7.8794,
+          "longitude": -61.2575,
+          "acq_datetime": "2026-11-03T17:36:00+00:00",
+          "frp": 56.99,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "9687c43c8872f86e05b169dc003cf593b06ffb2c9d2e8d96972aed3cb99aae6e",
+          "latitude": -6.8249,
+          "longitude": -59.2692,
+          "acq_datetime": "2026-11-02T17:53:00+00:00",
+          "frp": 52.04,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "5d6cba9cede2cda309ac9e8f363416ad10197ea464b33548188d8a18999b928e",
+          "latitude": -6.8296,
+          "longitude": -59.2684,
+          "acq_datetime": "2026-11-02T17:53:00+00:00",
+          "frp": 52.04,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "651b67d56e9337aea43413c89a79c23b2c43e35774e70b7abc89031216db1908",
+          "latitude": -9.2386,
+          "longitude": -58.9971,
+          "acq_datetime": "2026-11-02T17:53:00+00:00",
+          "frp": 51.41,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "5bfcbad5de2e30890e4d9d40816bcfb21799324d8274fef9fd107ff13a8ea3a9",
+          "latitude": -9.234,
+          "longitude": -58.9979,
+          "acq_datetime": "2026-11-02T17:53:00+00:00",
+          "frp": 51.41,
+          "confidence": "l",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "e1cce25c9895c2e51256180fa6961141aac120fcf433da8e88d4028ae86a00a2",
+          "latitude": -7.8833,
+          "longitude": -61.2604,
+          "acq_datetime": "2026-11-03T17:36:00+00:00",
+          "frp": 40.53,
+          "confidence": "n",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "f3bb021ae6322f189745be70ee3506851e37b454f0496f402ed4b4916bc53229",
+          "latitude": -6.8744,
+          "longitude": -59.3081,
+          "acq_datetime": "2026-11-01T18:13:00+00:00",
+          "frp": 37.44,
+          "confidence": "h",
+          "satellite": "N21"
+        },
+        {
+          "detection_key": "1c0e38da31838ea17e2531a47eb9db33333c71dd3cc327819058eb16443110d9",
+          "latitude": -6.8715,
+          "longitude": -59.3136,
+          "acq_datetime": "2026-11-01T18:13:00+00:00",
+          "frp": 37.21,
+          "confidence": "n",
+          "satellite": "N21"
+        }
+      ],
+      "frp_by_date": {
+        "2026-10-31": {
+          "mean": 9.54,
+          "median": 9.54,
+          "count": 1,
+          "max": 9.54
+        },
+        "2026-11-01": {
+          "mean": 14.24,
+          "median": 7.54,
+          "count": 18,
+          "max": 37.44
+        },
+        "2026-11-02": {
+          "mean": 12.79,
+          "median": 8.6,
+          "count": 99,
+          "max": 59.5
+        },
+        "2026-11-03": {
+          "mean": 6.77,
+          "median": 4.27,
+          "count": 53,
+          "max": 56.99
+        }
+      },
+      "frp_by_confidence": {
+        "h": {
+          "mean": 24.75,
+          "median": 25.01,
+          "count": 3
+        },
+        "l": {
+          "mean": 12.26,
+          "median": 7.62,
+          "count": 9
+        },
+        "n": {
+          "mean": 10.73,
+          "median": 7.34,
+          "count": 159
+        }
+      }
+    },
+    "sensors": {
+      "confidence_counts": {
+        "n": 159,
+        "l": 9,
+        "h": 3
+      },
+      "confidence_percentages": {
+        "n": 92.98,
+        "l": 5.26,
+        "h": 1.75
+      },
+      "satellite_counts": {
+        "N21": 171
+      },
+      "instrument_counts": {
+        "VIIRS": 171
+      },
+      "satellite_confidence": {
+        "N21": {
+          "h": 3,
+          "l": 9,
+          "n": 159
+        }
+      },
+      "daynight_confidence": {
+        "D": {
+          "h": 3,
+          "l": 9,
+          "n": 133
+        },
+        "N": {
+          "h": 0,
+          "l": 0,
+          "n": 26
+        }
+      }
+    },
+    "distributions": {
+      "frp": {
+        "available": true,
+        "label": "Fire Radiative Power (MW)",
+        "count": 171,
+        "missing": 0,
+        "min": 0.51,
+        "q1": 3.92,
+        "median": 7.41,
+        "mean": 11.06,
+        "q3": 11.79,
+        "max": 59.5,
+        "std": 12.19,
+        "skewness": 2.33,
+        "iqr": 7.86,
+        "lower_fence": -7.87,
+        "upper_fence": 23.59,
+        "outlier_count": 18,
+        "outlier_percentage": 10.53,
+        "outlier_values": [
+          59.5,
+          58.73,
+          56.99,
+          52.04,
+          52.04,
+          51.41,
+          51.41,
+          40.53,
+          37.44,
+          37.21,
+          37.21,
+          37.08,
+          37.08,
+          36.7,
+          33.24,
+          30.55,
+          25.33,
+          25.01
+        ],
+        "histogram": {
+          "log_scale": true,
+          "edges": [
+            0.51,
+            0.647,
+            0.821,
+            1.041,
+            1.321,
+            1.676,
+            2.126,
+            2.698,
+            3.423,
+            4.342,
+            5.509,
+            6.989,
+            8.866,
+            11.248,
+            14.27,
+            18.104,
+            22.968,
+            29.139,
+            36.968,
+            46.9,
+            59.5
+          ],
+          "counts": [
+            2,
+            0,
+            6,
+            6,
+            5,
+            5,
+            4,
+            9,
+            10,
+            15,
+            15,
+            27,
+            20,
+            11,
+            13,
+            4,
+            3,
+            3,
+            6,
+            7
+          ]
+        }
+      },
+      "bright_ti4": {
+        "available": true,
+        "label": "Brightness Temperature I-4 (K)",
+        "count": 171,
+        "missing": 0,
+        "min": 297.23,
+        "q1": 331.19,
+        "median": 336.7,
+        "mean": 334.51,
+        "q3": 342.62,
+        "max": 367.0,
+        "std": 14.25,
+        "skewness": -0.95,
+        "iqr": 11.44,
+        "lower_fence": 314.04,
+        "upper_fence": 359.78,
+        "outlier_count": 26,
+        "outlier_percentage": 15.2,
+        "outlier_values": [
+          367.0,
+          367.0,
+          367.0,
+          312.74,
+          310.63,
+          309.57,
+          308.87,
+          307.99,
+          306.46,
+          305.61,
+          305.47,
+          305.12,
+          305.06,
+          304.74,
+          304.62,
+          304.0,
+          303.39,
+          303.19,
+          302.38,
+          302.27,
+          301.6,
+          301.53,
+          298.69,
+          298.49,
+          297.9
+        ],
+        "histogram": {
+          "log_scale": false,
+          "edges": [
+            297.23,
+            300.719,
+            304.207,
+            307.696,
+            311.184,
+            314.673,
+            318.161,
+            321.649,
+            325.138,
+            328.627,
+            332.115,
+            335.603,
+            339.092,
+            342.581,
+            346.069,
+            349.558,
+            353.046,
+            356.534,
+            360.023,
+            363.512,
+            367.0
+          ],
+          "counts": [
+            4,
+            7,
+            7,
+            4,
+            1,
+            2,
+            0,
+            0,
+            2,
+            23,
+            28,
+            25,
+            25,
+            15,
+            15,
+            5,
+            5,
+            0,
+            0,
+            3
+          ]
+        }
+      },
+      "bright_ti5": {
+        "available": true,
+        "label": "Brightness Temperature I-5 (K)",
+        "count": 171,
+        "missing": 0,
+        "min": 270.76,
+        "q1": 291.3,
+        "median": 296.67,
+        "mean": 294.62,
+        "q3": 299.16,
+        "max": 309.24,
+        "std": 7.37,
+        "skewness": -1.18,
+        "iqr": 7.86,
+        "lower_fence": 279.5,
+        "upper_fence": 310.96,
+        "outlier_count": 9,
+        "outlier_percentage": 5.26,
+        "outlier_values": [
+          278.37,
+          275.82,
+          275.29,
+          275.22,
+          275.06,
+          274.52,
+          273.58,
+          273.18,
+          270.76
+        ],
+        "histogram": {
+          "log_scale": false,
+          "edges": [
+            270.76,
+            272.684,
+            274.608,
+            276.532,
+            278.456,
+            280.38,
+            282.304,
+            284.228,
+            286.152,
+            288.076,
+            290.0,
+            291.924,
+            293.848,
+            295.772,
+            297.696,
+            299.62,
+            301.544,
+            303.468,
+            305.392,
+            307.316,
+            309.24
+          ],
+          "counts": [
+            1,
+            3,
+            4,
+            1,
+            1,
+            6,
+            1,
+            4,
+            8,
+            6,
+            14,
+            7,
+            13,
+            33,
+            34,
+            18,
+            6,
+            9,
+            1,
+            1
+          ]
+        }
+      },
+      "frp_by_daynight": {
+        "D": {
+          "mean": 12.78,
+          "median": 8.25,
+          "count": 145,
+          "max": 59.5
+        },
+        "N": {
+          "mean": 1.44,
+          "median": 1.25,
+          "count": 26,
+          "max": 4.13
+        }
+      },
+      "missing_values": {
+        "latitude": 0,
+        "longitude": 0,
+        "acq_datetime": 0,
+        "frp": 0,
+        "bright_ti4": 0,
+        "bright_ti5": 0,
+        "confidence": 0,
+        "daynight": 0
+      }
+    },
+    "spatial_bounds": {
+      "min_latitude": -9.998,
+      "max_latitude": -6.0299,
+      "min_longitude": -61.5701,
+      "max_longitude": -58.1228,
+      "center_latitude": -8.5676,
+      "center_longitude": -59.9391
+    },
+    "data_quality_notes": [
+      "872 older database records fell outside the 5-day study window (from 2026-10-31) and were excluded from this analysis."
+    ]
+  },
+  "grid_metadata": {
+    "grid_size_degrees": 0.25,
+    "total_populated_cells": 40,
+    "high_priority_count": 3,
+    "medium_priority_count": 3,
+    "low_priority_count": 34,
+    "active_weights": {
+      "frequency": 0.45,
+      "recency": 0.25,
+      "frp": 0.2,
+      "confidence": 0.1
+    },
+    "redistribution_notes": []
+  },
+  "top_hotspot_cells": [
+    {
+      "rank": 1,
+      "grid_id": "grid_-7.00_-59.50",
+      "center_coordinates": "-6.8750, -59.3750",
+      "detection_count": 19,
+      "unique_dates": 3,
+      "mean_frp": 22.55,
+      "max_frp": 58.73,
+      "recent_count": 19,
+      "latest_detection_time": "2026-11-03T04:57:00+00:00",
+      "priority_score": 96.38,
+      "priority_label": "High Priority",
+      "score_explanation": "High Priority (Score: 96.38): Elevated fire activity with 19 total detections, 19 recent observations (last 48h), and average FRP of 22.6 MW."
+    },
+    {
+      "rank": 2,
+      "grid_id": "grid_-9.25_-59.00",
+      "center_coordinates": "-9.1250, -58.8750",
+      "detection_count": 20,
+      "unique_dates": 2,
+      "mean_frp": 15.34,
+      "max_frp": 59.5,
+      "recent_count": 20,
+      "latest_detection_time": "2026-11-03T17:36:00+00:00",
+      "priority_score": 93.24,
+      "priority_label": "High Priority",
+      "score_explanation": "High Priority (Score: 93.24): Elevated fire activity with 20 total detections, 20 recent observations (last 48h), and average FRP of 15.3 MW."
+    },
+    {
+      "rank": 3,
+      "grid_id": "grid_-8.00_-61.50",
+      "center_coordinates": "-7.8750, -61.3750",
+      "detection_count": 16,
+      "unique_dates": 3,
+      "mean_frp": 11.29,
+      "max_frp": 56.99,
+      "recent_count": 16,
+      "latest_detection_time": "2026-11-03T17:36:00+00:00",
+      "priority_score": 72.33,
+      "priority_label": "High Priority",
+      "score_explanation": "High Priority (Score: 72.33): Elevated fire activity with 16 total detections, 16 recent observations (last 48h), and average FRP of 11.3 MW."
+    },
+    {
+      "rank": 4,
+      "grid_id": "grid_-9.50_-59.50",
+      "center_coordinates": "-9.3750, -59.3750",
+      "detection_count": 12,
+      "unique_dates": 3,
+      "mean_frp": 6.63,
+      "max_frp": 11.79,
+      "recent_count": 12,
+      "latest_detection_time": "2026-11-03T17:36:00+00:00",
+      "priority_score": 52.43,
+      "priority_label": "Medium Priority",
+      "score_explanation": "Medium Priority (Score: 52.43): Moderate fire activity with 12 detections and 12 recent observations."
+    },
+    {
+      "rank": 5,
+      "grid_id": "grid_-8.25_-61.25",
+      "center_coordinates": "-8.1250, -61.1250",
+      "detection_count": 9,
+      "unique_dates": 2,
+      "mean_frp": 16.67,
+      "max_frp": 37.08,
+      "recent_count": 9,
+      "latest_detection_time": "2026-11-03T17:36:00+00:00",
+      "priority_score": 47.31,
+      "priority_label": "Medium Priority",
+      "score_explanation": "Medium Priority (Score: 47.31): Moderate fire activity with 9 detections and 9 recent observations."
+    },
+    {
+      "rank": 6,
+      "grid_id": "grid_-9.25_-60.50",
+      "center_coordinates": "-9.1250, -60.3750",
+      "detection_count": 9,
+      "unique_dates": 3,
+      "mean_frp": 10.84,
+      "max_frp": 25.33,
+      "recent_count": 9,
+      "latest_detection_time": "2026-11-03T17:36:00+00:00",
+      "priority_score": 43.94,
+      "priority_label": "Medium Priority",
+      "score_explanation": "Medium Priority (Score: 43.94): Moderate fire activity with 9 detections and 9 recent observations."
+    },
+    {
+      "rank": 7,
+      "grid_id": "grid_-9.50_-60.50",
+      "center_coordinates": "-9.3750, -60.3750",
+      "detection_count": 7,
+      "unique_dates": 3,
+      "mean_frp": 8.86,
+      "max_frp": 25.01,
+      "recent_count": 5,
+      "latest_detection_time": "2026-11-03T17:36:00+00:00",
+      "priority_score": 31.3,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 31.3): Lower relative detection volume (7 detections) and limited recent activity."
+    },
+    {
+      "rank": 8,
+      "grid_id": "grid_-7.25_-59.50",
+      "center_coordinates": "-7.1250, -59.3750",
+      "detection_count": 6,
+      "unique_dates": 1,
+      "mean_frp": 10.4,
+      "max_frp": 19.63,
+      "recent_count": 6,
+      "latest_detection_time": "2026-11-02T17:53:00+00:00",
+      "priority_score": 31.09,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 31.09): Lower relative detection volume (6 detections) and limited recent activity."
+    },
+    {
+      "rank": 9,
+      "grid_id": "grid_-10.00_-59.25",
+      "center_coordinates": "-9.8750, -59.1250",
+      "detection_count": 7,
+      "unique_dates": 2,
+      "mean_frp": 2.62,
+      "max_frp": 9.15,
+      "recent_count": 7,
+      "latest_detection_time": "2026-11-03T04:59:00+00:00",
+      "priority_score": 27.93,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 27.93): Lower relative detection volume (7 detections) and limited recent activity."
+    },
+    {
+      "rank": 10,
+      "grid_id": "grid_-10.00_-60.25",
+      "center_coordinates": "-9.8750, -60.1250",
+      "detection_count": 6,
+      "unique_dates": 1,
+      "mean_frp": 6.58,
+      "max_frp": 11.03,
+      "recent_count": 6,
+      "latest_detection_time": "2026-11-02T17:53:00+00:00",
+      "priority_score": 27.51,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 27.51): Lower relative detection volume (6 detections) and limited recent activity."
+    },
+    {
+      "rank": 11,
+      "grid_id": "grid_-10.00_-60.00",
+      "center_coordinates": "-9.8750, -59.8750",
+      "detection_count": 7,
+      "unique_dates": 3,
+      "mean_frp": 2.96,
+      "max_frp": 6.21,
+      "recent_count": 5,
+      "latest_detection_time": "2026-11-03T04:59:00+00:00",
+      "priority_score": 25.76,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 25.76): Lower relative detection volume (7 detections) and limited recent activity."
+    },
+    {
+      "rank": 12,
+      "grid_id": "grid_-8.25_-61.50",
+      "center_coordinates": "-8.1250, -61.3750",
+      "detection_count": 4,
+      "unique_dates": 1,
+      "mean_frp": 11.61,
+      "max_frp": 30.55,
+      "recent_count": 4,
+      "latest_detection_time": "2026-11-02T17:53:00+00:00",
+      "priority_score": 23.94,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 23.94): Lower relative detection volume (4 detections) and limited recent activity."
+    },
+    {
+      "rank": 13,
+      "grid_id": "grid_-9.25_-61.00",
+      "center_coordinates": "-9.1250, -60.8750",
+      "detection_count": 5,
+      "unique_dates": 3,
+      "mean_frp": 5.4,
+      "max_frp": 9.54,
+      "recent_count": 4,
+      "latest_detection_time": "2026-11-02T17:53:00+00:00",
+      "priority_score": 21.01,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 21.01): Lower relative detection volume (5 detections) and limited recent activity."
+    },
+    {
+      "rank": 14,
+      "grid_id": "grid_-6.75_-61.50",
+      "center_coordinates": "-6.6250, -61.3750",
+      "detection_count": 3,
+      "unique_dates": 1,
+      "mean_frp": 12.48,
+      "max_frp": 13.9,
+      "recent_count": 3,
+      "latest_detection_time": "2026-11-02T17:56:00+00:00",
+      "priority_score": 20.61,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 20.61): Lower relative detection volume (3 detections) and limited recent activity."
+    },
+    {
+      "rank": 15,
+      "grid_id": "grid_-10.00_-60.50",
+      "center_coordinates": "-9.8750, -60.3750",
+      "detection_count": 3,
+      "unique_dates": 1,
+      "mean_frp": 11.95,
+      "max_frp": 16.34,
+      "recent_count": 3,
+      "latest_detection_time": "2026-11-02T17:53:00+00:00",
+      "priority_score": 20.11,
+      "priority_label": "Low Priority",
+      "score_explanation": "Low Priority (Score: 20.11): Lower relative detection volume (3 detections) and limited recent activity."
+    }
+  ],
+  "artifacts": {
+    "daily_fire_activity": "reports\\charts\\20261104_035626\\daily_fire_activity.png",
+    "hourly_activity": "reports\\charts\\20261104_035626\\hourly_activity.png",
+    "confidence_distribution": "reports\\charts\\20261104_035626\\confidence_distribution.png",
+    "frp_distribution": "reports\\charts\\20261104_035626\\frp_distribution.png",
+    "brightness_distribution": "reports\\charts\\20261104_035626\\brightness_distribution.png",
+    "outlier_boxplots": "reports\\charts\\20261104_035626\\outlier_boxplots.png",
+    "day_night_distribution": "reports\\charts\\20261104_035626\\day_night_distribution.png",
+    "satellite_sensor_distribution": "reports\\charts\\20261104_035626\\satellite_sensor_distribution.png",
+    "hotspot_priority_distribution": "reports\\charts\\20261104_035626\\hotspot_priority_distribution.png",
+    "fire_activity_map": "reports\\charts\\20261104_035626\\fire_activity_map.html"
+  },
+  "scientific_limitation_statement": "NASA FIRMS records active-fire detections or thermal anomalies. A detection alone does not prove a confirmed wildfire. The Fire Activity Priority Score is an analytical ranking based on stored detections, not a wildfire prediction or official emergency warning."
+}

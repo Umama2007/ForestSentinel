@@ -64,6 +64,7 @@ class ConservationRepository:
             db_client: Authenticated SupabaseClient instance.
         """
         self.db_client = db_client
+        self._assessments_cache: Optional[Dict[str, Dict[str, Any]]] = None
 
     def create_run(self, metadata: Dict[str, Any]) -> str:
         """Create a new conservation analysis run row with status 'running'.
@@ -133,8 +134,12 @@ class ConservationRepository:
         """
         doc_id = self._make_assessment_doc_id(scientific_name, taxon_key)
         try:
-            data = self.db_client.get_one(self.COLLECTION_ASSESSMENTS, "id", doc_id)
-            if data:
+            if self._assessments_cache is None:
+                rows = self.db_client.select(self.COLLECTION_ASSESSMENTS)
+                self._assessments_cache = {str(r.get("id")): dict(r) for r in rows if r.get("id")}
+            cached = self._assessments_cache.get(doc_id)
+            if cached:
+                data = dict(cached)
                 data.pop("id", None)
                 data["iucn_source"] = "database_cache"
                 return data
@@ -166,6 +171,8 @@ class ConservationRepository:
 
         try:
             self.db_client.insert(self.COLLECTION_ASSESSMENTS, [cache_doc], on_conflict="id", conflict="merge")
+            if self._assessments_cache is not None:
+                self._assessments_cache[doc_id] = dict(cache_doc)
             logger.debug("Cached IUCN assessment for '%s' (%s)", scientific_name, doc_id)
         except Exception as exc:
             logger.warning("Failed saving cached IUCN assessment '%s': %s", doc_id, exc)

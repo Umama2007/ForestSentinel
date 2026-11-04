@@ -92,6 +92,8 @@ def _register_fonts() -> Tuple[str, str, str, str]:
         return "FS-Regular", "FS-Bold", "FS-Semibold", "FS-Mono"
 
     win = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+    linux_dejavu = Path("/usr/share/fonts/truetype/dejavu")
+    linux_ttf = Path("/usr/share/fonts/TTF")
     try:
         import matplotlib
         mpl = Path(matplotlib.__file__).parent / "mpl-data" / "fonts" / "ttf"
@@ -99,10 +101,10 @@ def _register_fonts() -> Tuple[str, str, str, str]:
         mpl = Path(".")
 
     candidates = {
-        "FS-Regular": [win / "segoeui.ttf", mpl / "DejaVuSans.ttf"],
-        "FS-Bold": [win / "segoeuib.ttf", mpl / "DejaVuSans-Bold.ttf"],
-        "FS-Semibold": [win / "seguisb.ttf", win / "segoeuib.ttf", mpl / "DejaVuSans-Bold.ttf"],
-        "FS-Mono": [win / "consola.ttf", mpl / "DejaVuSansMono.ttf"],
+        "FS-Regular": [win / "segoeui.ttf", mpl / "DejaVuSans.ttf", linux_dejavu / "DejaVuSans.ttf", linux_ttf / "DejaVuSans.ttf"],
+        "FS-Bold": [win / "segoeuib.ttf", mpl / "DejaVuSans-Bold.ttf", linux_dejavu / "DejaVuSans-Bold.ttf", linux_ttf / "DejaVuSans-Bold.ttf"],
+        "FS-Semibold": [win / "seguisb.ttf", win / "segoeuib.ttf", mpl / "DejaVuSans-Bold.ttf", linux_dejavu / "DejaVuSans-Bold.ttf", linux_ttf / "DejaVuSans-Bold.ttf"],
+        "FS-Mono": [win / "consola.ttf", mpl / "DejaVuSansMono.ttf", linux_dejavu / "DejaVuSansMono.ttf", linux_ttf / "DejaVuSansMono.ttf"],
     }
     resolved = {}
     for name, paths in candidates.items():
@@ -549,7 +551,7 @@ def _sec_etl(etl: Dict[str, Any], num: str = "01") -> List[Flowable]:
         ("Source", etl.get("api_source")), ("Bounding box", etl.get("study_bbox")),
         ("Day range", etl.get("day_range")), ("Started", _datetime(etl.get("started_at"))),
         ("Duration", f"{_fmt(etl.get('duration_seconds'), 1)} s"), ("Database project", etl.get("database_project") or etl.get("firebase_project_id")),
-        ("Raw CSV archive", Path(str(etl.get("raw_csv_saved_at", "—"))).name),
+        ("Raw CSV archive", str(etl.get("raw_csv_saved_at", "—")).replace("\\", "/").rsplit("/", 1)[-1]),
     ]
     story += [Paragraph("Run details", S_H2),
               _table(["Field", "Value"], [[k, f"<font name='{MONO}' size=8>{_esc(v)}</font>"] for k, v in details],
