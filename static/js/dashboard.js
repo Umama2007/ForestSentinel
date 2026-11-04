@@ -837,7 +837,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="chart-card-footer">${t.group === 'analysis' ? 'Part 2 analysis' : 'Part 3 biodiversity'} · ${esc(t.file)}</div>
         </div>`).join('')
       : '<div class="chart-card"><p class="empty">No figures generated yet. Run Part 2 analysis.</p></div>';
-    $('#footer-sources').textContent = [sources.etl, sources.analysis, sources.conservation].filter(Boolean).join(' · ');
+    const footerSources = $('#footer-sources');
+    if (footerSources) {
+      footerSources.textContent = [sources.etl, sources.analysis, sources.conservation].filter(Boolean).join(' · ');
+    }
   }
 
   function renderReportMeta({ etl, analysis, conservation, conservation_stale: stale }) {

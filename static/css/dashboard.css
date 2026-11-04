@@ -1577,6 +1577,7 @@ section[id], header[id] { scroll-margin-top: 100px; }
 }
 
 .footer-left { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.footer-right { display: flex; align-items: center; gap: 10px; }
 .footer-brand {
   font-family: var(--font-heading);
   font-weight: 700;
