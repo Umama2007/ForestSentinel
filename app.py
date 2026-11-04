@@ -245,21 +245,35 @@ def report_pdf(kind: str):
 
 @app.route("/api/metrics")
 def api_metrics():
-    """Return headline metrics from the latest reports (kept for API compatibility)."""
+    """Return headline metrics from the latest reports and optional live Supabase check."""
     analysis = load_json(get_latest_file("reports/analysis_report_*.json")) or {}
     etl = load_json(get_latest_file("reports/etl_report_*.json")) or {}
     grid = analysis.get("grid_metadata", {})
     overview = analysis.get("eda_results", {}).get("overview", {})
-    return jsonify({
+    sb_url = os.environ.get("SUPABASE_URL", "").strip()
+    sb_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "").strip()
+    payload: Dict[str, Any] = {
         "status": "ok" if analysis else "no_analysis",
         "database_project": etl.get("database_project") or etl.get("firebase_project_id"),
+        "supabase_configured": bool(sb_url and sb_key),
         "raw_rows_extracted": etl.get("counts", {}).get("raw_rows_extracted"),
         "fire_detections": overview.get("total_records"),
         "populated_grid_cells": grid.get("total_populated_cells"),
         "high_priority_hotspots": grid.get("high_priority_count"),
         "medium_priority_hotspots": grid.get("medium_priority_count"),
         "low_priority_hotspots": grid.get("low_priority_count"),
-    })
+    }
+    if request.args.get("live") == "1" and sb_url and sb_key:
+        try:
+            from forestsentinel.supabase_client import SupabaseClient
+            client = SupabaseClient(sb_url, sb_key, timeout_seconds=10)
+            runs = client.select("etl_runs", limit=1)
+            payload["supabase_live_connection"] = "connected"
+            payload["supabase_project_ref"] = client.project_ref
+            payload["supabase_sample_run_present"] = len(runs) > 0
+        except Exception as exc:
+            payload["supabase_live_connection"] = f"error: {exc}"
+    return jsonify(payload)
 
 
 @app.route("/api/run/<stage>", methods=["POST"])
