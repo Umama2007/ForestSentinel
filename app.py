@@ -54,6 +54,12 @@ def index():
     return render_template("dashboard.html")
 
 
+@app.route("/favicon.ico")
+def favicon():
+    """Serve the ForestSentinel SVG favicon for browsers requesting /favicon.ico."""
+    return send_from_directory(str(BASE_DIR / "static"), "favicon.svg", mimetype="image/svg+xml")
+
+
 @app.route("/map/fire")
 def map_fire():
     """Serve the latest interactive Folium Fire Activity & Priority Map."""

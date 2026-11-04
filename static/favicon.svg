@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#06281e"/>
+      <stop offset="100%" stop-color="#050b16"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="16" y1="12" x2="48" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="60%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="38" y1="12" x2="52" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded badge background -->
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#bg)" stroke="#10b981" stroke-width="2.5" stroke-opacity="0.6"/>
+  <!-- Cute layered pine/canopy tree -->
+  <path d="M30 12L15 31H23L13 45H47L37 31H45L30 12Z" fill="url(#leaf)" stroke="#a7f3d0" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- Tree trunk -->
+  <rect x="27" y="45" width="6" height="8" rx="2" fill="#34d399"/>
+  <!-- Satellite thermal spark / flame badge -->
+  <circle cx="47" cy="19" r="9" fill="#050b16" stroke="#34d399" stroke-width="1.5" stroke-opacity="0.5"/>
+  <path d="M47 12C47 12 52 16.2 52 20.2C52 23 49.8 25 47 25C44.2 25 42 23 42 20.2C42 18.3 43.3 16.5 44.5 15.6C44.3 17.2 45.4 18.2 46.2 18.2C45.7 15.8 47 12 47 12Z" fill="url(#flame)"/>
+</svg>
